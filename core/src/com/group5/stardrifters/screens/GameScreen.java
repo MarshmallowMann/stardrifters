@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.group5.stardrifters.Application;
 import com.group5.stardrifters.utils.B2DBodyBuilder;
+import com.group5.stardrifters.utils.MyContactListener;
 
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
 
@@ -22,7 +23,7 @@ public class GameScreen extends AbstractScreen {
     Body circle;
 
     // Gravitational constant
-    float G = 40f;
+    float G = 60f;
 
     public GameScreen(final Application app) {
         super(app);
@@ -43,12 +44,15 @@ public class GameScreen extends AbstractScreen {
         box.applyForceToCenter(linearForce, true);
         app.batch.setProjectionMatrix(camera.combined);
         app.shapeBatch.setProjectionMatrix(camera.combined);
+        //apply random angular velocity
+        box.setAngularVelocity(0.2f);
+        world.setContactListener(new MyContactListener(box, circle));
+
     }
 
     @Override
     public void update(float delta) {
    world.step(1f /Application.APP_FPS, 6, 2);
-
     Vector2 circlePosition = circle.getPosition();
     Vector2 boxPosition = box.getPosition();
     Vector2 direction = circlePosition.cpy().sub(boxPosition);

@@ -36,6 +36,7 @@ public class B2DBodyBuilder {
         FixtureDef fDef = new FixtureDef();
         fDef.shape = shape;
         fDef.density = 1.0f;
+        fDef.restitution = 0.2f;
         body.createFixture(fDef);
         // Dispose
         shape.dispose();
