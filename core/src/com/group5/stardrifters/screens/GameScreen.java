@@ -1,11 +1,16 @@
 package com.group5.stardrifters.screens;
 
+import box2dLight.ConeLight;
+import box2dLight.DirectionalLight;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.group5.stardrifters.Application;
@@ -21,6 +26,8 @@ import java.util.ArrayList;
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
 
 public class GameScreen extends AbstractScreen {
+    SpriteBatch batch = new SpriteBatch();
+    Texture bg = new Texture("galaxy_bg.png");
     OrthographicCamera camera;
 
     // Box2D
@@ -52,8 +59,13 @@ public class GameScreen extends AbstractScreen {
     public void show() {
         world = new World(new Vector2(0, 0f), false);
         rayHandler = new RayHandler(world);
-        rayHandler.setAmbientLight(0.5f);
+        rayHandler.setAmbientLight(0.1f);
+        rayHandler.setBlurNum(3);
         createWalls();
+DirectionalLight light1 = new DirectionalLight(rayHandler, 100, Color.BLUE, 45);
+DirectionalLight light2 = new DirectionalLight(rayHandler, 100, Color.BLUE, 135);
+DirectionalLight light3 = new DirectionalLight(rayHandler, 100, Color.BLUE, 225);
+DirectionalLight light4 = new DirectionalLight(rayHandler, 100, Color.BLUE, 315);
 
          // Array of colors
          Color[] colors = new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE};
@@ -101,7 +113,7 @@ public class GameScreen extends AbstractScreen {
         pointLight.attachToBody(circle.body);
 
         // Set the color of the PointLight to white
-        pointLight.setColor(Color.WHITE);
+        pointLight.setColor(Color.BLACK);
         pointLight.setDistance(12f);
         pointLight.setXray(true);
 
@@ -188,11 +200,14 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     public void render(float delta) {
-        super.render(delta);
-        b2dr.render(world, camera.combined.cpy().scl(PPM));
-        rayHandler.setCombinedMatrix(camera.combined.cpy().scl(PPM));
-        rayHandler.updateAndRender();
-        stage.draw();
+    super.render(delta);
+    // Continue with your existing rendering code
+    b2dr.render(world, camera.combined.cpy().scl(PPM));
+
+    rayHandler.setCombinedMatrix(camera.combined.cpy().scl(PPM));
+    rayHandler.updateAndRender();
+    stage.draw();
+
 
     }
 
