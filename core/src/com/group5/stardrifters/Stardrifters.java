@@ -55,8 +55,8 @@ public class Stardrifters extends ApplicationAdapter {
     triangleShape.dispose();
  }
 
- @Override
- public void render () {
+@Override
+public void render () {
     world.step(Gdx.graphics.getDeltaTime(), 6, 2); // Step the Box2D physics simulation
 
     camera.update();
@@ -80,14 +80,26 @@ public class Stardrifters extends ApplicationAdapter {
     float newX = circleBody.getPosition().x + 64 * (float)Math.cos(angle);
     float newY = circleBody.getPosition().y + 64 * (float)Math.sin(angle);
 
-    triangleBody.setTransform(newX, newY, (float)Math.toRadians(angle));
+    // Calculate the direction of the path
+    Vector2 direction = new Vector2(newX, newY).sub(triangleBody.getPosition()).nor();
+
+    // Apply a force in the direction of the path
+    float forceMagnitude = 1000; // Adjust this value as needed
+    triangleBody.applyForceToCenter(direction.scl(forceMagnitude), true);
+
+    // Set the rotation of the triangle body
+    Vector2 velocity = triangleBody.getLinearVelocity();
+    System.out.println(velocity);
+    float rotationAngle = (float)Math.atan2(velocity.y, velocity.x);
+    triangleBody.setTransform(triangleBody.getPosition(), rotationAngle);
+
     shapeRenderer.begin(ShapeType.Line);
     shapeRenderer.setColor(Color.GREEN);
     shapeRenderer.triangle(triangleBody.getPosition().x, triangleBody.getPosition().y,
                            triangleBody.getPosition().x + 16, triangleBody.getPosition().y,
                            triangleBody.getPosition().x + 8, triangleBody.getPosition().y + 16);
     shapeRenderer.end();
- }
+}
 
  @Override
  public void dispose () {

@@ -8,11 +8,12 @@ import com.group5.stardrifters.Stardrifters;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setForegroundFPS(60);
-		config.setTitle("Stardrifters");
-		config.setWindowedMode(800, 600);
-		config.setResizable(false);
-		config.useVsync(true);
-		new Lwjgl3Application(new Stardrifters(), config);
+		Application app = new Application();
+		config.setForegroundFPS(Application.APP_FPS);
+		config.setTitle(Application.APP_TITLE);
+		config.setWindowedMode(Application.APP_WIDTH, Application.APP_HEIGHT);
+		config.setResizable(Application.APP_RESIZABLE);
+		config.useVsync(Application.APP_VSYNC);
+		new Lwjgl3Application(app, config);
 	}
 }
