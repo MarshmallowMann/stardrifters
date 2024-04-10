@@ -15,13 +15,22 @@ public class B2DBodyBuilder {
         // Body
         BodyDef bDef = new BodyDef();
         bDef.type = BodyDef.BodyType.DynamicBody;
-        bDef.fixedRotation = true;
+        bDef.fixedRotation = false;
         bDef.position.set(X/PPM, Y/PPM);
 
         body = world.createBody(bDef);
-        // Shape
+        // Shape a triangle
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width/2/PPM, height/2/PPM);
+
+        // Create a triangle
+//        PolygonShape shape = new PolygonShape();
+//        Vector2[] vertices = new Vector2[3];
+//        vertices[0] = new Vector2(-width/2/PPM, -height/2/PPM);
+//        vertices[1] = new Vector2(width/2/PPM, -height/2/PPM);
+//        vertices[2] = new Vector2(0, height/2/PPM);
+//        shape.set(vertices);
+
 
         // Fixture
         FixtureDef fDef = new FixtureDef();
@@ -50,7 +59,7 @@ public class B2DBodyBuilder {
         // Fixture
         FixtureDef fDef = new FixtureDef();
         fDef.shape = shape;
-        fDef.density = 100.0f;
+        fDef.density = 1.0f;
         body.createFixture(fDef);
         // Dispose
         shape.dispose();

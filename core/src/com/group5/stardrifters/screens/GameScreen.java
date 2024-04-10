@@ -1,11 +1,11 @@
 package com.group5.stardrifters.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.group5.stardrifters.Application;
-import com.group5.stardrifters.managers.GameScreenManager;
 import com.group5.stardrifters.utils.B2DBodyBuilder;
 
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
@@ -21,6 +21,9 @@ public class GameScreen extends AbstractScreen {
     Body box;
     Body circle;
 
+    // Gravitational constant
+    float G = 40f;
+
     public GameScreen(final Application app) {
         super(app);
 
@@ -34,9 +37,10 @@ public class GameScreen extends AbstractScreen {
         world = new World(new Vector2(0, 0f), false);
         createWalls();
 //        box = B2DBodyBuilder.createBox(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32);
-        circle = B2DBodyBuilder.createCircle(world, camera.viewportWidth/2, camera.viewportHeight/2, 8f);
-        box = B2DBodyBuilder.createBox(world, camera.viewportWidth/2+200, camera.viewportHeight/2, 32, 32);
-
+        circle = B2DBodyBuilder.createCircle(world, camera.viewportWidth/2, camera.viewportHeight/2, 16f);
+        box = B2DBodyBuilder.createBox(world, camera.viewportWidth/2+300, camera.viewportHeight/2, 32, 32);
+        Vector2 linearForce = new Vector2(0, 1000);
+        box.applyForceToCenter(linearForce, true);
         app.batch.setProjectionMatrix(camera.combined);
         app.shapeBatch.setProjectionMatrix(camera.combined);
     }
@@ -45,26 +49,38 @@ public class GameScreen extends AbstractScreen {
     public void update(float delta) {
    world.step(1f /Application.APP_FPS, 6, 2);
 
-    // Calculate the vector from the box to the circle
-    Vector2 direction = new Vector2(circle.getPosition()).sub(box.getPosition());
+    Vector2 circlePosition = circle.getPosition();
+    Vector2 boxPosition = box.getPosition();
+    Vector2 direction = circlePosition.cpy().sub(boxPosition);
+    float distance = direction.len();
 
-    // Calculate the distance between the box and the circle
-    float r = direction.len();
 
-    // Calculate the gravitational force
-    float F = (circle.getMass() * box.getMass()) / (r * r);
 
     // Normalize the direction vector
-    direction.nor();
+    if (distance > 0) {
+        direction.nor();
+    }
 
-    // Multiply the direction by the gravitational force
-    direction.scl(F);
+    // Calculate gravitational force magnitude (inverse square law)
+    float forceMagnitude = (G * 15f* box.getMass()) / (distance * distance);
+    // Apply the gravitational force to the rectangle body
+    Vector2 force = direction.scl(forceMagnitude);
 
-    // Apply the gravitational force to the box
-    box.applyForceToCenter(direction, true);
+    box.applyForceToCenter(force, true);
+    // Apply y axis linear force so that it orbits the circle
 
-    // Apply a larger gravitational force to the circle
-    circle.applyForceToCenter(direction.scl(-2), true);
+
+//    On space bar click, apply impulse to the box away from the circle
+    if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        // Calculate impulse direction away from the circle
+        Vector2 impulseDirection = boxPosition.cpy().sub(circlePosition);
+        impulseDirection.nor();
+        // Calculate impulse magnitude
+        float impulseMagnitude = 15f;
+        // Apply impulse to the box
+        box.applyLinearImpulse(impulseDirection.scl(impulseMagnitude), boxPosition, true);
+    }
+
 
     stage.act(delta);
     this.camera.update();
