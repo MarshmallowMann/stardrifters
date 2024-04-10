@@ -2,6 +2,7 @@ package com.group5.stardrifters.utils;
 import com.badlogic.gdx.physics.box2d.*;
 import com.group5.stardrifters.objects.Box;
 import com.group5.stardrifters.objects.Circle;
+import com.group5.stardrifters.objects.Food;
 
 public class MyContactListener implements ContactListener {
 
@@ -23,6 +24,21 @@ public class MyContactListener implements ContactListener {
             }
 
             box.hit();
+            //detect if box hits food
+        } else if (checkBoxFood(fixtureA, fixtureB)) {
+            Box box;
+            Food food;
+
+            if (fixtureA.getBody().getUserData() instanceof Box) {
+                box = (Box) fixtureA.getBody().getUserData();
+                food = (Food) fixtureB.getBody().getUserData();
+            } else {
+                box = (Box) fixtureB.getBody().getUserData();
+                food = (Food) fixtureA.getBody().getUserData();
+            }
+
+            box.hitFood();
+            food.hit();
         }
 
 
@@ -44,6 +60,12 @@ public class MyContactListener implements ContactListener {
     private boolean checkBoxCircle(Fixture fixtureA, Fixture fixtureB) {
         boolean a = fixtureA.getBody().getUserData() instanceof Box;
         boolean b = fixtureB.getBody().getUserData() instanceof Circle;
+        return a && b;
+    }
+
+    private boolean checkBoxFood(Fixture fixtureA, Fixture fixtureB) {
+        boolean a = fixtureA.getBody().getUserData() instanceof Box;
+        boolean b = fixtureB.getBody().getUserData() instanceof Food;
         return a && b;
     }
 }
