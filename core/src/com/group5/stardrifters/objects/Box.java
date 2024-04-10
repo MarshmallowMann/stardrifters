@@ -47,6 +47,13 @@ public class Box {
         this.hit = true;
     }
 
+    public void hitFood(){
+        System.out.println("Box " + this.id + " has eaten food!");
+        this.score += 10;
+        System.out.println("Score: " + this.score);
+
+    }
+
     public void respawn(OrthographicCamera camera) {
         this.hit = false;
         // hide the box for 2 seconds

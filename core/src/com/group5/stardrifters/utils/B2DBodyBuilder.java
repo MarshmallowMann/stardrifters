@@ -17,6 +17,8 @@ public class B2DBodyBuilder {
         bDef.type = BodyDef.BodyType.DynamicBody;
         bDef.fixedRotation = false;
         bDef.position.set(X/PPM, Y/PPM);
+        bDef.linearDamping = 0.2f;
+        bDef.angularDamping = 1f;
 
         body = world.createBody(bDef);
         // Shape a triangle
@@ -74,7 +76,7 @@ public class B2DBodyBuilder {
 
         // Body
         BodyDef bDef = new BodyDef();
-        bDef.type = BodyDef.BodyType.DynamicBody;
+        bDef.type = BodyDef.BodyType.StaticBody;
         bDef.fixedRotation = false;
         bDef.position.set(X / PPM, Y / PPM);
 
@@ -93,9 +95,10 @@ public class B2DBodyBuilder {
         // Create fixture and attach shape to the body
         FixtureDef fDef = new FixtureDef();
         fDef.shape = shape;
-        fDef.density = 1.0f; // Adjust density as needed
+        fDef.isSensor = true; // Set to true if you want the object to pass through other objects
+        fDef.density = 0f; // Adjust density as needed
         fDef.friction = 0.5f; // Adjust friction as needed
-        fDef.restitution = 0.3f; // Adjust restitution (bounce) as needed
+        fDef.restitution = 0f; // Adjust restitution (bounce) as needed
 
         body.createFixture(fDef);
 

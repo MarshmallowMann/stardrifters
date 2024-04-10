@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.group5.stardrifters.Application;
 import com.group5.stardrifters.objects.Box;
 import com.group5.stardrifters.objects.Circle;
+import com.group5.stardrifters.objects.Food;
 import com.group5.stardrifters.utils.B2DBodyBuilder;
 import com.group5.stardrifters.utils.MyContactListener;
 
@@ -26,6 +27,7 @@ public class GameScreen extends AbstractScreen {
     // Box2D body
     // Array of boxes
     ArrayList<Box> boxes = new ArrayList<Box>();
+    ArrayList<Food> foods = new ArrayList<Food>();
     Circle circle;
 
     // Gravitational constant
@@ -54,6 +56,12 @@ public class GameScreen extends AbstractScreen {
             box.body.setAngularVelocity(0.2f);
 
             boxes.add(box);
+        }
+
+        for (int i = 0; i < 10; i++) {
+            Food food = new Food(world, camera.viewportWidth/2, camera.viewportHeight/2, 16, 16);
+            food.respawn(camera);
+            foods.add(food);
         }
 
         app.batch.setProjectionMatrix(camera.combined);
@@ -88,6 +96,14 @@ public class GameScreen extends AbstractScreen {
 
     }
 
+    for (Food food : foods) {
+        if (food.hit) {
+            food.respawn(camera);
+
+        }
+
+    }
+
 
 
     // Normalize the direction vector
@@ -102,7 +118,7 @@ public class GameScreen extends AbstractScreen {
         Vector2 impulseDirection = boxPosition.cpy().sub(circlePosition);
         impulseDirection.nor();
         // Calculate impulse magnitude
-        float impulseMagnitude = 15f;
+        float impulseMagnitude = 25f;
         // Apply impulse to the box
         boxes.get(0).body.applyLinearImpulse(impulseDirection.scl(impulseMagnitude), boxPosition, true);
     }
