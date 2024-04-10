@@ -38,21 +38,19 @@ public class Application extends Game {
 
     @Override
     public void create() {
-        gsm = new GameScreenManager(this);
+
         assets = new AssetManager();
         batch = new SpriteBatch();
         bg = new Texture("galaxy_bg.png");
         shapeBatch = new ShapeRenderer();
+        gsm = new GameScreenManager(this);
+
 
     }
 
     @Override
     public void render() {
         super.render();
-
-        batch.begin();
-        batch.draw(bg, 0, 0);
-        batch.end();
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
@@ -62,8 +60,10 @@ public class Application extends Game {
 
     @Override
     public void dispose() {
+        super.dispose();
         batch.dispose();
         bg.dispose();
         shapeBatch.dispose();
+        gsm.dispose();
     }
 }
