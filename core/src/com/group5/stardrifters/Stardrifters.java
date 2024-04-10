@@ -18,11 +18,11 @@ public class Stardrifters extends ApplicationAdapter {
   OrthographicCamera camera;
 
   World world; // Box2D world
-  Body circleBody, triangleBody; // Box2D bodies
+  Body circleBody, rectangleBody; // Box2D bodies
 
-  float revolutionSpeed = 1f; // Speed of revolution in radians per second
+  float revolutionSpeed = 100f; // Speed of revolution in radians per second
   float totalTime = 0f; // Total time elapsed
-
+    float G = 100f;
  @Override
  public void create () {
     batch = new SpriteBatch();
@@ -41,18 +41,19 @@ public class Stardrifters extends ApplicationAdapter {
     circleBody = world.createBody(circleBodyDef);
     CircleShape circleShape = new CircleShape();
     circleShape.setRadius(24);
-    circleBody.createFixture(circleShape, 0.0f);
+    circleBody.createFixture(circleShape, 1.0f);
     circleShape.dispose();
 
     // Create the triangle body
-    BodyDef triangleBodyDef = new BodyDef();
-    triangleBodyDef.type = BodyDef.BodyType.DynamicBody;
-    triangleBodyDef.position.set(Gdx.graphics.getWidth() / 2 + 64, Gdx.graphics.getHeight() / 2);
-    triangleBody = world.createBody(triangleBodyDef);
-    PolygonShape triangleShape = new PolygonShape();
-    triangleShape.set(new float[] {-8, -8, 8, -8, 0, 8});
-    triangleBody.createFixture(triangleShape, 0.0f);
-    triangleShape.dispose();
+     BodyDef rectangleBodyDef = new BodyDef();
+     rectangleBodyDef.type = BodyDef.BodyType.DynamicBody;
+     rectangleBodyDef.position.set(Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() / 2);
+     rectangleBody = world.createBody(rectangleBodyDef);
+     PolygonShape rectangleShape = new PolygonShape();
+     rectangleShape.setAsBox(16, 16); // Half-width and half-height
+     rectangleBody.createFixture(rectangleShape, 1.0f);
+     rectangleShape.dispose();
+     System.out.println(rectangleBody.getMass());
  }
 
 @Override
@@ -70,36 +71,39 @@ public void render () {
     shapeRenderer.begin(ShapeType.Filled);
     shapeRenderer.setColor(Color.RED);
     shapeRenderer.circle(circleBody.getPosition().x, circleBody.getPosition().y, 24);
+
+    // Draw the rectangle
+    shapeRenderer.setColor(Color.BLUE); // Set rectangle color
+    Vector2 position = rectangleBody.getPosition();
+    float halfWidth = 16; // Half-width used in setAsBox
+    float halfHeight = 16; // Half-height used in setAsBox
+    shapeRenderer.rect(position.x - halfWidth, position.y - halfHeight, halfWidth * 2, halfHeight * 2);
+
     shapeRenderer.end();
 
     // Increment the total time by the delta time
     totalTime += Gdx.graphics.getDeltaTime();
 
-    // Calculate the new position of the triangle
-    float angle = (totalTime * revolutionSpeed) % 360;
-    float newX = circleBody.getPosition().x + 64 * (float)Math.cos(angle);
-    float newY = circleBody.getPosition().y + 64 * (float)Math.sin(angle);
+    Vector2 circlePosition = circleBody.getPosition();
+    Vector2 rectanglePosition = rectangleBody.getPosition();
+    Vector2 direction = circlePosition.cpy().sub(rectanglePosition);
+    float distance = direction.len();
 
-    // Calculate the direction of the path
-    Vector2 direction = new Vector2(newX, newY).sub(triangleBody.getPosition()).nor();
-
-    // Apply a force in the direction of the path
-    float forceMagnitude = 1000; // Adjust this value as needed
-    triangleBody.applyForceToCenter(direction.scl(forceMagnitude), true);
-
-    // Set the rotation of the triangle body
-    Vector2 velocity = triangleBody.getLinearVelocity();
-    System.out.println(velocity);
-    float rotationAngle = (float)Math.atan2(velocity.y, velocity.x);
-    triangleBody.setTransform(triangleBody.getPosition(), rotationAngle);
-
-    shapeRenderer.begin(ShapeType.Line);
-    shapeRenderer.setColor(Color.GREEN);
-    shapeRenderer.triangle(triangleBody.getPosition().x, triangleBody.getPosition().y,
-                           triangleBody.getPosition().x + 16, triangleBody.getPosition().y,
-                           triangleBody.getPosition().x + 8, triangleBody.getPosition().y + 16);
-    shapeRenderer.end();
+    // Normalize the direction vector
+    if (distance > 0) {
+        direction.nor();
+    }
+    // Calculate gravitational force magnitude (inverse square law)
+    float forceMagnitude = (G * 15000* rectangleBody.getMass()) / (distance * distance);
+    // Apply the gravitational force to the rectangle body
+    Vector2 force = direction.scl(forceMagnitude);
+    rectangleBody.applyForceToCenter(force, true);
+    // Apply y axis linear force so that it orbits the circle
+    Vector2 linearForce = new Vector2(0, 70000);
+    rectangleBody.applyForceToCenter(linearForce, true);
 }
+
+
 
  @Override
  public void dispose () {
