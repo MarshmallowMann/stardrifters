@@ -1,7 +1,10 @@
 package com.group5.stardrifters.screens;
 
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -31,8 +34,11 @@ public class GameScreen extends AbstractScreen {
     Circle circle;
 
     // Gravitational constant
-    float G = 60f;
+    float G = 30f;
     boolean shouldMoveDynamicBody = false;
+
+    // RayHandler
+     RayHandler rayHandler;
 
     public GameScreen(final Application app) {
         super(app);
@@ -45,8 +51,13 @@ public class GameScreen extends AbstractScreen {
     @Override
     public void show() {
         world = new World(new Vector2(0, 0f), false);
+        rayHandler = new RayHandler(world);
+        rayHandler.setAmbientLight(0.5f);
         createWalls();
-//        box = B2DBodyBuilder.createBox(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32);
+
+         // Array of colors
+         Color[] colors = new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE};
+
         circle = new Circle(world, camera.viewportWidth/2, camera.viewportHeight/2, 16f, "circle");
         for (int i = 0; i < 2; i++) {
             Box box = new Box(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32, "box" + i);
@@ -54,7 +65,16 @@ public class GameScreen extends AbstractScreen {
             Vector2 linearForce = new Vector2(0, 1000);
             box.body.applyForceToCenter(linearForce, true);
             box.body.setAngularVelocity(0.2f);
+            // Create a PointLight for each Box and attach it to the Box's body
+            PointLight pointLight = new PointLight(rayHandler, 50);
 
+            // reduce light intensity
+            pointLight.setDistance(2f);
+
+            pointLight.attachToBody(box.body);
+
+             // Set the color of the PointLight to a color from the array
+            pointLight.setColor(colors[i % colors.length]);
             boxes.add(box);
         }
 
@@ -62,12 +82,38 @@ public class GameScreen extends AbstractScreen {
             Food food = new Food(world, camera.viewportWidth/2, camera.viewportHeight/2, 16, 16);
             food.respawn(camera);
             foods.add(food);
+            // Create a PointLight for each Food and attach it to the Food's body
+            PointLight pointLight = new PointLight(rayHandler, 50); // Smaller number for less light
+
+            // reduce light intensity
+            pointLight.setDistance(1f);
+//            Make it more intense
+            pointLight.setSoftnessLength(0f);
+            pointLight.attachToBody(food.body);
+
+            // Set the color of the PointLight to blue
+            pointLight.setColor(Color.ORANGE);
+
         }
+
+
+        PointLight pointLight = new PointLight(rayHandler, 100);
+        pointLight.attachToBody(circle.body);
+
+        // Set the color of the PointLight to white
+        pointLight.setColor(Color.WHITE);
+        pointLight.setDistance(12f);
+        pointLight.setXray(true);
+
+        MyContactListener contactListener = new MyContactListener();
+        world.setContactListener(contactListener);
 
         app.batch.setProjectionMatrix(camera.combined);
         app.shapeBatch.setProjectionMatrix(camera.combined);
-        MyContactListener contactListener = new MyContactListener();
-        world.setContactListener(contactListener);
+
+
+
+
 
     }
 
@@ -135,6 +181,7 @@ public class GameScreen extends AbstractScreen {
 
 
     stage.act(delta);
+
     this.camera.update();
     }
 
@@ -143,7 +190,10 @@ public class GameScreen extends AbstractScreen {
     public void render(float delta) {
         super.render(delta);
         b2dr.render(world, camera.combined.cpy().scl(PPM));
+        rayHandler.setCombinedMatrix(camera.combined.cpy().scl(PPM));
+        rayHandler.updateAndRender();
         stage.draw();
+
     }
 
     @Override
@@ -171,6 +221,7 @@ public class GameScreen extends AbstractScreen {
         super.dispose();
         world.dispose();
         b2dr.dispose();
+      rayHandler.dispose();  // Dispose the RayHandler
     }
 
     private void createWalls() {
