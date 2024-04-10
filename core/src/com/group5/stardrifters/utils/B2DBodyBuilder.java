@@ -67,6 +67,44 @@ public class B2DBodyBuilder {
         return body;
     }
 
+    public static final float PPM = 32f; // Pixels per meter
+
+    public static Body createTriangle(World world, float X, float Y, float width, float height) {
+        Body body;
+
+        // Body
+        BodyDef bDef = new BodyDef();
+        bDef.type = BodyDef.BodyType.DynamicBody;
+        bDef.fixedRotation = false;
+        bDef.position.set(X / PPM, Y / PPM);
+
+        body = world.createBody(bDef);
+
+        // Vertices of the triangle (assuming it's an equilateral triangle)
+        Vector2[] vertices = new Vector2[3];
+        vertices[0] = new Vector2(0, height / 2 / PPM); // Top vertex
+        vertices[1] = new Vector2(-width / 2 / PPM, -height / 2 / PPM); // Bottom left vertex
+        vertices[2] = new Vector2(width / 2 / PPM, -height / 2 / PPM); // Bottom right vertex
+
+        // Create a triangle shape using the vertices
+        PolygonShape shape = new PolygonShape();
+        shape.set(vertices);
+
+        // Create fixture and attach shape to the body
+        FixtureDef fDef = new FixtureDef();
+        fDef.shape = shape;
+        fDef.density = 1.0f; // Adjust density as needed
+        fDef.friction = 0.5f; // Adjust friction as needed
+        fDef.restitution = 0.3f; // Adjust restitution (bounce) as needed
+
+        body.createFixture(fDef);
+
+        // Dispose the shape to avoid memory leaks
+        shape.dispose();
+
+        return body;
+    }
+
     public static Body createBall(World world, float X, float Y, float radius) {
         Body body;
 
@@ -116,5 +154,6 @@ public class B2DBodyBuilder {
         shape.dispose();
         return body;
     }
+
 
 }
