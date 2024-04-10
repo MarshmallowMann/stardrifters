@@ -54,4 +54,29 @@ public class B2DBodyBuilder {
         return body;
     }
 
+    public static Body createBall(World world, float X, float Y, float radius) {
+        Body body;
+
+        // Body
+        BodyDef bDef = new BodyDef();
+        bDef.type = BodyDef.BodyType.DynamicBody;
+        bDef.fixedRotation = true;
+        bDef.position.set(X/PPM, Y/PPM);
+
+        body = world.createBody(bDef);
+
+        // Shape
+        CircleShape shape = new CircleShape();
+        shape.setRadius(radius/PPM);
+
+        // Fixture
+        FixtureDef fDef = new FixtureDef();
+        fDef.shape = shape;
+        fDef.density = 1.0f;
+        body.createFixture(fDef);
+        // Dispose
+        shape.dispose();
+        return body;
+    }
+
 }
