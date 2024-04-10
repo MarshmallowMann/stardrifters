@@ -1,6 +1,9 @@
 package com.group5.stardrifters.utils;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+
+import java.util.Vector;
 
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
 
@@ -11,7 +14,7 @@ public class B2DBodyBuilder {
 
         // Body
         BodyDef bDef = new BodyDef();
-        bDef.type = BodyDef.BodyType.StaticBody;
+        bDef.type = BodyDef.BodyType.DynamicBody;
         bDef.fixedRotation = true;
         bDef.position.set(X/PPM, Y/PPM);
 
@@ -47,7 +50,7 @@ public class B2DBodyBuilder {
         // Fixture
         FixtureDef fDef = new FixtureDef();
         fDef.shape = shape;
-        fDef.density = 1.0f;
+        fDef.density = 100.0f;
         body.createFixture(fDef);
         // Dispose
         shape.dispose();
@@ -73,6 +76,31 @@ public class B2DBodyBuilder {
         FixtureDef fDef = new FixtureDef();
         fDef.shape = shape;
         fDef.density = 1.0f;
+        body.createFixture(fDef);
+        // Dispose
+        shape.dispose();
+        return body;
+    }
+
+    public static Body createChainShape(World world, Vector2[] verts, boolean isStatic) {
+        Body body;
+
+        // Body
+        BodyDef bDef = new BodyDef();
+        bDef.type = isStatic ? BodyDef.BodyType.StaticBody : BodyDef.BodyType.DynamicBody;
+        bDef.fixedRotation = true;
+
+        body = world.createBody(bDef);
+
+        // Shape
+        ChainShape shape = new ChainShape();
+        shape.createChain(verts);
+
+        // Fixture
+        FixtureDef fDef = new FixtureDef();
+        fDef.shape = shape;
+        fDef.density = 1.0f;
+        fDef.restitution = 0.5f;
         body.createFixture(fDef);
         // Dispose
         shape.dispose();

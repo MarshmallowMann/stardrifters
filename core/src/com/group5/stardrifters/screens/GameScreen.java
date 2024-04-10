@@ -1,10 +1,9 @@
 package com.group5.stardrifters.screens;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
 import com.group5.stardrifters.Application;
 import com.group5.stardrifters.managers.GameScreenManager;
 import com.group5.stardrifters.utils.B2DBodyBuilder;
@@ -32,10 +31,11 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     public void show() {
-        world = new World(new Vector2(0, -9.7f), false);
-        box = B2DBodyBuilder.createBox(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32);
-        circle = B2DBodyBuilder.createCircle(world, camera.viewportWidth/2+50, camera.viewportHeight/2+50, 32);
-
+        world = new World(new Vector2(0, 0f), false);
+        createWalls();
+//        box = B2DBodyBuilder.createBox(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32);
+        circle = B2DBodyBuilder.createCircle(world, camera.viewportWidth/2, camera.viewportHeight/2, 8f);
+        box = B2DBodyBuilder.createBox(world, camera.viewportWidth/2+200, camera.viewportHeight/2, 32, 32);
 
         app.batch.setProjectionMatrix(camera.combined);
         app.shapeBatch.setProjectionMatrix(camera.combined);
@@ -43,17 +43,37 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     public void update(float delta) {
-        world.step(1/Application.APP_FPS, 6, 2);
+   world.step(1f /Application.APP_FPS, 6, 2);
 
-        stage.act(delta);
+    // Calculate the vector from the box to the circle
+    Vector2 direction = new Vector2(circle.getPosition()).sub(box.getPosition());
 
+    // Calculate the distance between the box and the circle
+    float r = direction.len();
+
+    // Calculate the gravitational force
+    float F = (circle.getMass() * box.getMass()) / (r * r);
+
+    // Normalize the direction vector
+    direction.nor();
+
+    // Multiply the direction by the gravitational force
+    direction.scl(F);
+
+    // Apply the gravitational force to the box
+    box.applyForceToCenter(direction, true);
+
+    // Apply a larger gravitational force to the circle
+    circle.applyForceToCenter(direction.scl(-2), true);
+
+    stage.act(delta);
+    this.camera.update();
     }
 
 
     @Override
     public void render(float delta) {
         super.render(delta);
-
         b2dr.render(world, camera.combined.cpy().scl(PPM));
         stage.draw();
     }
@@ -83,5 +103,15 @@ public class GameScreen extends AbstractScreen {
         super.dispose();
         world.dispose();
         b2dr.dispose();
+    }
+
+    private void createWalls() {
+        Vector2[] verts = new Vector2[5];
+        verts[0] = new Vector2(1f / PPM, 0);
+        verts[1] = new Vector2(camera.viewportWidth / PPM, 0);
+        verts[2] = new Vector2(camera.viewportWidth / PPM, (camera.viewportHeight - 1f) / PPM);
+        verts[3] = new Vector2(1f / PPM, (camera.viewportHeight - 1f) / PPM);
+        verts[4] = new Vector2(1f / PPM, 0);
+        B2DBodyBuilder.createChainShape(world, verts, true);
     }
 }
