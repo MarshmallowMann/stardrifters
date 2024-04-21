@@ -44,17 +44,23 @@ public class ServerProgram extends Listener {
         packetMessage.message = "Hello friend! The time is: "+new Date().toString();
 
         //Send the message
-        c.sendTCP(packetMessage);
+//        c.sendTCP(packetMessage);
         //Alternatively, we could do:
-        //c.sendUDP(packetMessage);
+        c.sendUDP(packetMessage);
         //To send over UDP.
     }
 
     //This is run when we receive a packet.
     public void received(Connection c, Object p){
-        //We will do nothing here.
-        //We do not expect to receive any packets.
-        //(But if we did, nothing would happen)
+//        When we receive packets, we need to check if they are the same class as the packet we registered.
+        if(p instanceof PacketMessage){
+            //Cast it, so we can access the message within.
+            PacketMessage packet = (PacketMessage) p;
+            System.out.println("Received a message from "+c.getRemoteAddressTCP().getHostString()+": "+packet.message);
+
+//            Broadcast the message to all clients.
+            server.sendToAllUDP(packet);
+        }
     }
 
     //This is run when a client has disconnected.

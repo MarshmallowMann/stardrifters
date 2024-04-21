@@ -76,7 +76,7 @@ public class GameScreen extends AbstractScreen {
 
         circle = new Circle(world, camera.viewportWidth/2, camera.viewportHeight/2, 16f, "circle");
         for (int i = 0; i < 2; i++) {
-            Box box = new Box(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32, "box" + i);
+            Box box = new Box(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32, "box" + i, app);
             box.respawn(camera);
             Vector2 linearForce = new Vector2(0, 1000);
             box.body.applyForceToCenter(linearForce, true);
@@ -138,7 +138,9 @@ public class GameScreen extends AbstractScreen {
             Vector2 direction = circlePosition.cpy().sub(boxPosition);
             float distance = direction.len();
             if (distance > 0) direction.nor();
-            if (box.hit) box.respawn(camera);
+            if (box.hit) {
+                app.clientProgram.sendMessage( box.id + "has eaten food!. Score" + box.score);
+                box.respawn(camera);}
             float forceMagnitude = (G * 15f* box.body.getMass()) / (distance * distance);
             // Apply the gravitational force to the rectangle body
             Vector2 force = direction.scl(forceMagnitude);
@@ -149,12 +151,8 @@ public class GameScreen extends AbstractScreen {
 
         for (Food food : foods) {
             if (food.hit) food.respawn(camera);
+
         }
-
-        // Normalize the direction vector
-
-
-        // Calculate gravitational force magnitude (inverse square law)
 
     //    On space bar click, apply impulse to the box away from the circle
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {

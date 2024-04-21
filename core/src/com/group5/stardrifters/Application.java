@@ -10,6 +10,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.group5.stardrifters.managers.GameScreenManager;
+import com.group5.stardrifters.utils.ClientProgram;
+
+import java.io.IOException;
+
 
 public class Application extends Game {
 
@@ -20,6 +24,7 @@ public class Application extends Game {
     public static boolean APP_RESIZABLE = false;
     public static boolean APP_VSYNC = true;
     public static int APP_FPS = 60;
+
 
     // Game Vars
     public static int V_WIDTH = 800;
@@ -33,6 +38,10 @@ public class Application extends Game {
     public SpriteBatch batch;
     public ShapeRenderer shapeBatch;
 
+    // Client
+    public ClientProgram clientProgram = new ClientProgram();
+
+
 
     Texture bg;
 
@@ -44,6 +53,16 @@ public class Application extends Game {
         bg = new Texture("galaxy_bg.png");
         shapeBatch = new ShapeRenderer();
         gsm = new GameScreenManager(this);
+
+//    Connect to client
+        try {
+            clientProgram.connect();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        clientProgram.sendMessage("Hello from the client!");
+
 
 
     }

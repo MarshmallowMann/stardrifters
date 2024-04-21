@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Timer;
+import com.group5.stardrifters.Application;
 import com.group5.stardrifters.utils.B2DBodyBuilder;
 
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
@@ -14,8 +14,9 @@ public class Box {
     public int score;
     public String id;
     public Boolean hit = false;
+    public Application app;
 
-    public Box(World world, float X, float Y, float width, float height, String id) {
+    public Box(World world, float X, float Y, float width, float height, String id, Application app) {
         this.body = B2DBodyBuilder.createBox(world, X, Y, width, height);
         this.body.setUserData(this);
         this.score = 100;
@@ -40,17 +41,25 @@ public class Box {
     }
 
     public void hit() {
-        System.out.println("Box " + this.id + " has been hit!");
-        this.score--;
-        System.out.println("Score: " + this.score);
+//        System.out.println("Box " + this.id + " has been hit!");
+        // Send a message to the server that the box has been hit
+//
+         this.score--;
+//        System.out.println("Score: " + this.score);
+
+//        Send a message to the server that t he box has been hit
+
+
+
         // respawn box in a random location
         this.hit = true;
     }
 
     public void hitFood(){
-        System.out.println("Box " + this.id + " has eaten food!");
+//        System.out.println("Box " + this.id + " has eaten food!");
+
         this.score += 10;
-        System.out.println("Score: " + this.score);
+//        System.out.println("Score: " + this.score);
 
     }
 
@@ -60,7 +69,7 @@ public class Box {
         this.body.setActive(false);
         body.setActive(true);
         Vector2 location = randomLocation(camera);
-        System.out.println("Respawning boxId:" + id + " at " + location);
+//        System.out.println("Respawning boxId:" + id + " at " + location);
 
         body.setTransform(location, 0);
     }

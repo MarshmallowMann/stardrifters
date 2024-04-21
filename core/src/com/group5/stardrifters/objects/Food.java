@@ -19,7 +19,7 @@ public class Food {
     }
 
     public void hit() {
-        System.out.println("Food has been hit!");
+//        System.out.println("Food has been hit!");
         // respawn food in a random location
         this.hit = true;
     }
@@ -30,7 +30,7 @@ public class Food {
         this.body.setActive(false);
         body.setActive(true);
         Vector2 location = randomLocation(camera);
-        System.out.println("Respawning food at " + location);
+//        System.out.println("Respawning food at " + location);
 
         body.setTransform(location, 0);
     }
