@@ -60,30 +60,28 @@ public class Box {
         this.body.setActive(false);
         body.setActive(true);
         Vector2 location = randomLocation(camera);
-        System.out.println("Respawning " + id + " at " + location);
+        System.out.println("Respawning boxId:" + id + " at " + location);
 
         body.setTransform(location, 0);
-        // Apply random force to the box
-        float x = (float) Math.random() * 500 + 100;
-        float y = (float) Math.random() * 500 + 100;
-        body.applyForceToCenter(new Vector2(x, y), true);
     }
 
 
     private Vector2 randomLocation(OrthographicCamera camera) {
-        float x_min = (camera.viewportWidth/2 - 32) / PPM;
-        float x_max = (camera.viewportWidth/2 + 32) / PPM;
-        float y_min = (camera.viewportHeight/2 - 32) / PPM;
-        float y_max = (camera.viewportHeight/2 + 32) / PPM;
+        float x_min = 32 / PPM;
+        float x_max = (camera.viewportWidth - 32) / PPM;
+        float y_min = 32 / PPM;
+        float y_max = (camera.viewportHeight - 32) / PPM;
 
         float x = (float) (Math.random() * camera.viewportWidth) / PPM;
         float y = (float) (Math.random() * camera.viewportHeight) / PPM;
-        while ( (x > x_min && x < x_max ) || (y > y_min && y < y_max || (x < 1) || (y < 1) || (x > camera.viewportWidth/PPM) || y > camera.viewportHeight/PPM) ) {
 
-            x = (float) Math.random() * camera.viewportWidth / PPM;
-            y = (float) Math.random() * camera.viewportHeight / PPM;
+        while(true) {
+            if((x > x_min && x < x_max ) && (y > y_min && y < y_max)) break;
+            else {
+                x = (float) Math.random() * camera.viewportWidth / PPM;
+                y = (float) Math.random() * camera.viewportHeight / PPM;
+            }
         }
-
         return new Vector2(x, y);
     }
 }

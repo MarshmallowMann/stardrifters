@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -26,8 +27,10 @@ import java.util.ArrayList;
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
 
 public class GameScreen extends AbstractScreen {
+    private HUD hud;
     SpriteBatch batch = new SpriteBatch();
     Texture bg = new Texture("galaxy_bg.png");
+    BitmapFont font = new BitmapFont();
     OrthographicCamera camera;
 
     // Box2D
@@ -53,6 +56,7 @@ public class GameScreen extends AbstractScreen {
         this.camera = new OrthographicCamera();
         this.camera.setToOrtho(false, Application.V_WIDTH, Application.V_HEIGHT);
         b2dr = new Box2DDebugRenderer();
+        hud = new HUD(batch);
     }
 
     @Override
@@ -62,10 +66,10 @@ public class GameScreen extends AbstractScreen {
         rayHandler.setAmbientLight(0.1f);
         rayHandler.setBlurNum(3);
         createWalls();
-DirectionalLight light1 = new DirectionalLight(rayHandler, 100, Color.BLUE, 45);
-DirectionalLight light2 = new DirectionalLight(rayHandler, 100, Color.BLUE, 135);
-DirectionalLight light3 = new DirectionalLight(rayHandler, 100, Color.BLUE, 225);
-DirectionalLight light4 = new DirectionalLight(rayHandler, 100, Color.BLUE, 315);
+        DirectionalLight light1 = new DirectionalLight(rayHandler, 100, Color.BLUE, 45);
+        DirectionalLight light2 = new DirectionalLight(rayHandler, 100, Color.BLUE, 135);
+        DirectionalLight light3 = new DirectionalLight(rayHandler, 100, Color.BLUE, 225);
+        DirectionalLight light4 = new DirectionalLight(rayHandler, 100, Color.BLUE, 315);
 
          // Array of colors
          Color[] colors = new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE};
@@ -81,7 +85,7 @@ DirectionalLight light4 = new DirectionalLight(rayHandler, 100, Color.BLUE, 315)
             PointLight pointLight = new PointLight(rayHandler, 50);
 
             // reduce light intensity
-            pointLight.setDistance(2f);
+            pointLight.setDistance(2.5f);
 
             pointLight.attachToBody(box.body);
 
@@ -98,7 +102,7 @@ DirectionalLight light4 = new DirectionalLight(rayHandler, 100, Color.BLUE, 315)
             PointLight pointLight = new PointLight(rayHandler, 50); // Smaller number for less light
 
             // reduce light intensity
-            pointLight.setDistance(1f);
+            pointLight.setDistance(1.5f);
 //            Make it more intense
             pointLight.setSoftnessLength(0f);
             pointLight.attachToBody(food.body);
@@ -112,9 +116,9 @@ DirectionalLight light4 = new DirectionalLight(rayHandler, 100, Color.BLUE, 315)
         PointLight pointLight = new PointLight(rayHandler, 100);
         pointLight.attachToBody(circle.body);
 
-        // Set the color of the PointLight to white
+        // Set the color of the PointLight to black
         pointLight.setColor(Color.BLACK);
-        pointLight.setDistance(12f);
+        pointLight.setDistance(16f);
         pointLight.setXray(true);
 
         MyContactListener contactListener = new MyContactListener();
@@ -122,64 +126,47 @@ DirectionalLight light4 = new DirectionalLight(rayHandler, 100, Color.BLUE, 315)
 
         app.batch.setProjectionMatrix(camera.combined);
         app.shapeBatch.setProjectionMatrix(camera.combined);
-
-
-
-
-
     }
 
     @Override
     public void update(float delta) {
-   world.step(1f /Application.APP_FPS, 6, 2);
-    Vector2 circlePosition = circle.body.getPosition();
+       world.step(1f /Application.APP_FPS, 6, 2);
+        Vector2 circlePosition = circle.body.getPosition();
 
-    for (Box box : boxes) {
-        Vector2 boxPosition = box.body.getPosition();
-        Vector2 direction = circlePosition.cpy().sub(boxPosition);
-        float distance = direction.len();
-        if (distance > 0) {
-            direction.nor();
-        }
-        if (box.hit) {
-            box.respawn(camera);
+        for (Box box : boxes) {
+            Vector2 boxPosition = box.body.getPosition();
+            Vector2 direction = circlePosition.cpy().sub(boxPosition);
+            float distance = direction.len();
+            if (distance > 0) direction.nor();
+            if (box.hit) box.respawn(camera);
+            float forceMagnitude = (G * 15f* box.body.getMass()) / (distance * distance);
+            // Apply the gravitational force to the rectangle body
+            Vector2 force = direction.scl(forceMagnitude);
 
-        }
-        float forceMagnitude = (G * 15f* box.body.getMass()) / (distance * distance);
-        // Apply the gravitational force to the rectangle body
-        Vector2 force = direction.scl(forceMagnitude);
-
-        box.body.applyForceToCenter(force, true);
-        // Apply y axis linear force so that it orbits the circle
-
-    }
-
-    for (Food food : foods) {
-        if (food.hit) {
-            food.respawn(camera);
-
+            box.body.applyForceToCenter(force, true);
+            // Apply y axis linear force so that it orbits the circle
         }
 
-    }
+        for (Food food : foods) {
+            if (food.hit) food.respawn(camera);
+        }
+
+        // Normalize the direction vector
 
 
+        // Calculate gravitational force magnitude (inverse square law)
 
-    // Normalize the direction vector
-
-
-    // Calculate gravitational force magnitude (inverse square law)
-
-//    On space bar click, apply impulse to the box away from the circle
-    if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-        // Calculate impulse direction away from the circle
-        Vector2 boxPosition = boxes.get(0).body.getPosition();
-        Vector2 impulseDirection = boxPosition.cpy().sub(circlePosition);
-        impulseDirection.nor();
-        // Calculate impulse magnitude
-        float impulseMagnitude = 25f;
-        // Apply impulse to the box
-        boxes.get(0).body.applyLinearImpulse(impulseDirection.scl(impulseMagnitude), boxPosition, true);
-    }
+    //    On space bar click, apply impulse to the box away from the circle
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            // Calculate impulse direction away from the circle
+            Vector2 boxPosition = boxes.get(0).body.getPosition();
+            Vector2 impulseDirection = boxPosition.cpy().sub(circlePosition);
+            impulseDirection.nor();
+            // Calculate impulse magnitude
+            float impulseMagnitude = 25f;
+            // Apply impulse to the box
+            boxes.get(0).body.applyLinearImpulse(impulseDirection.scl(impulseMagnitude), boxPosition, true);
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             // Calculate impulse direction away from the circle
             Vector2 boxPosition = boxes.get(1).body.getPosition();
@@ -191,24 +178,26 @@ DirectionalLight light4 = new DirectionalLight(rayHandler, 100, Color.BLUE, 315)
             boxes.get(1).body.applyLinearImpulse(impulseDirection.scl(impulseMagnitude), boxPosition, true);
         }
 
-
-    stage.act(delta);
-
-    this.camera.update();
+        stage.act(delta);
+        hud.update(delta);
+        this.camera.update();
     }
 
 
     @Override
     public void render(float delta) {
-    super.render(delta);
-    // Continue with your existing rendering code
-    b2dr.render(world, camera.combined.cpy().scl(PPM));
-
-    rayHandler.setCombinedMatrix(camera.combined.cpy().scl(PPM));
-    rayHandler.updateAndRender();
-    stage.draw();
-
-
+        super.render(delta);
+        // Continue with your existing rendering code
+        batch.begin();
+        batch.draw(bg, 0, 0);
+        font.draw(batch, "Hello World!", 10, 10);
+        batch.end();
+        b2dr.render(world, camera.combined.cpy().scl(PPM));
+        rayHandler.setCombinedMatrix(camera.combined.cpy().scl(PPM));
+        rayHandler.updateAndRender();
+        batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        hud.stage.draw();
+        stage.draw();
     }
 
     @Override
@@ -252,6 +241,4 @@ DirectionalLight light4 = new DirectionalLight(rayHandler, 100, Color.BLUE, 315)
     public void setShouldMoveDynamicBody(boolean shouldMoveDynamicBody) {
         this.shouldMoveDynamicBody = shouldMoveDynamicBody;
     }
-
-    //function
 }
