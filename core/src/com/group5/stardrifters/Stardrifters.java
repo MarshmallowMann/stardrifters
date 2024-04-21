@@ -111,5 +111,6 @@ public void render () {
    bg.dispose();
    shapeRenderer.dispose();
    world.dispose(); // Dispose the Box2D world
+
  }
 }

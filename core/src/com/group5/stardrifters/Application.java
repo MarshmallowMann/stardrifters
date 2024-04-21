@@ -10,6 +10,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.group5.stardrifters.managers.GameScreenManager;
+import com.group5.stardrifters.utils.ClientProgram;
+import com.group5.stardrifters.utils.MyTextInputListener;
+
+import java.io.IOException;
+
 
 public class Application extends Game {
 
@@ -21,9 +26,11 @@ public class Application extends Game {
     public static boolean APP_VSYNC = true;
     public static int APP_FPS = 60;
 
+
     // Game Vars
     public static int V_WIDTH = 800;
     public static int V_HEIGHT = 600;
+    public static String playerName;
 
     // Managers
     public AssetManager assets;
@@ -32,6 +39,10 @@ public class Application extends Game {
     // Batches
     public SpriteBatch batch;
     public ShapeRenderer shapeBatch;
+
+    // Client
+    public ClientProgram clientProgram = new ClientProgram();
+
 
 
     Texture bg;
@@ -45,13 +56,19 @@ public class Application extends Game {
         shapeBatch = new ShapeRenderer();
         gsm = new GameScreenManager(this);
 
+//    Connect to client
+        try {
+            clientProgram.connect();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 
     @Override
     public void render() {
         super.render();
-
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
 
