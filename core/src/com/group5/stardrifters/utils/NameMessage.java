@@ -1,6 +1,5 @@
 package com.group5.stardrifters.utils;
 
-public class PacketMessage {
-    public String message;
+public class NameMessage {
     public String name;
 }

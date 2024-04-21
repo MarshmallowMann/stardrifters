@@ -14,15 +14,20 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.group5.stardrifters.Application;
 import com.group5.stardrifters.objects.Box;
 import com.group5.stardrifters.objects.Circle;
 import com.group5.stardrifters.objects.Food;
 import com.group5.stardrifters.utils.B2DBodyBuilder;
+import com.group5.stardrifters.utils.ClientProgram;
 import com.group5.stardrifters.utils.MyContactListener;
+import com.group5.stardrifters.utils.MyTextInputListener;
+
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
 
@@ -33,20 +38,23 @@ public class GameScreen extends AbstractScreen {
     BitmapFont font = new BitmapFont();
     OrthographicCamera camera;
 
+    public ArrayList<String> getChatHistory() {
+        return chatHistory;
+    }
+
+    ArrayList<String> chatHistory = ClientProgram.getChatHistory();
     // Box2D
     World world;
     Box2DDebugRenderer b2dr;
-
     // Box2D body
     // Array of boxes
     ArrayList<Box> boxes = new ArrayList<Box>();
     ArrayList<Food> foods = new ArrayList<Food>();
     Circle circle;
-
+    Integer offsetY = 200;
     // Gravitational constant
     float G = 30f;
     boolean shouldMoveDynamicBody = false;
-
     // RayHandler
      RayHandler rayHandler;
 
@@ -61,6 +69,8 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     public void show() {
+        MyTextInputListener Textlistener = new MyTextInputListener();
+        Gdx.input.getTextInput(Textlistener, "Dialog Title", "Initial Textfield Value", "Hint Value");
         world = new World(new Vector2(0, 0f), false);
         rayHandler = new RayHandler(world);
         rayHandler.setAmbientLight(0.1f);
@@ -86,7 +96,6 @@ public class GameScreen extends AbstractScreen {
 
             // reduce light intensity
             pointLight.setDistance(2.5f);
-
             pointLight.attachToBody(box.body);
 
              // Set the color of the PointLight to a color from the array
@@ -130,16 +139,26 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     public void update(float delta) {
+//        Get chat history from client program
        world.step(1f /Application.APP_FPS, 6, 2);
         Vector2 circlePosition = circle.body.getPosition();
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            // if the chatHistory array is more than 5, remove the first element
 
+            TextField textField = hud.userInputField;
+            String message = textField.getText();
+            textField.setText("");
+            //aSystem.out.println("Sending message: " + message);
+            app.clientProgram.sendMessage(message, Application.playerName);
+        }
         for (Box box : boxes) {
+            // listen for enter press
             Vector2 boxPosition = box.body.getPosition();
             Vector2 direction = circlePosition.cpy().sub(boxPosition);
             float distance = direction.len();
             if (distance > 0) direction.nor();
             if (box.hit) {
-                app.clientProgram.sendMessage( box.id + "has eaten food!. Score" + box.score);
+                //app.clientProgram.sendMessage( box.id + "has eaten food!. Score" + box.score);
                 box.respawn(camera);}
             float forceMagnitude = (G * 15f* box.body.getMass()) / (distance * distance);
             // Apply the gravitational force to the rectangle body
@@ -188,12 +207,19 @@ public class GameScreen extends AbstractScreen {
         // Continue with your existing rendering code
         batch.begin();
         batch.draw(bg, 0, 0);
-        font.draw(batch, "Hello World!", 10, 10);
+
         batch.end();
         b2dr.render(world, camera.combined.cpy().scl(PPM));
         rayHandler.setCombinedMatrix(camera.combined.cpy().scl(PPM));
         rayHandler.updateAndRender();
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        batch.begin();
+
+        for(int i = 1; i < chatHistory.size()+1; i++) {
+            font.draw(batch, chatHistory.get(i-1), 10, i*(-20) + offsetY );
+        }
+        font.draw(batch, Application.playerName + ": ", 20, 20);
+        batch.end();
         hud.stage.draw();
         stage.draw();
     }
