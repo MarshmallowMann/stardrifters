@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.group5.stardrifters.Application;
+import com.group5.stardrifters.managers.GameScreenManager;
 import com.group5.stardrifters.objects.Box;
 import com.group5.stardrifters.objects.Circle;
 import com.group5.stardrifters.objects.Food;
@@ -198,6 +199,14 @@ public class GameScreen extends AbstractScreen {
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
         stage.draw();
+
+        if(gameOver()) {
+            app.gsm.setScreen(GameScreenManager.STATE.GAMEOVER);
+        }
+    }
+
+    public boolean gameOver() {
+        return hud.isTimeUp();
     }
 
     @Override
@@ -225,7 +234,7 @@ public class GameScreen extends AbstractScreen {
         super.dispose();
         world.dispose();
         b2dr.dispose();
-      rayHandler.dispose();  // Dispose the RayHandler
+        rayHandler.dispose();  // Dispose the RayHandler
     }
 
     private void createWalls() {

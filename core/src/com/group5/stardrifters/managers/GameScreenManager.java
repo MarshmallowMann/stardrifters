@@ -1,9 +1,13 @@
 package com.group5.stardrifters.managers;
 
+import com.badlogic.gdx.Game;
 import com.group5.stardrifters.Application;
 import com.group5.stardrifters.screens.AbstractScreen;
+import com.group5.stardrifters.screens.GameOver;
 import com.group5.stardrifters.screens.GameScreen;
+import com.group5.stardrifters.screens.MainMenu;
 
+import java.awt.*;
 import java.util.HashMap;
 
 public class GameScreenManager {
@@ -23,14 +27,15 @@ public class GameScreenManager {
         this.app = app;
 
         initGameScreens();
-        setScreen(STATE.GAME);
+        setScreen(STATE.MENU);
     }
 
     private void initGameScreens() {
         // Add game screens here
         this.gameScreens = new HashMap<STATE, AbstractScreen>();
         this.gameScreens.put(STATE.GAME, new GameScreen(app));
-
+        this.gameScreens.put(STATE.GAMEOVER, new GameOver(app));
+        this.gameScreens.put(STATE.MENU, new MainMenu(app));
     }
 
     public void setScreen(STATE nextScreen) {
@@ -43,5 +48,10 @@ public class GameScreenManager {
                 screen.dispose();
             }
         }
+    }
+
+    public void reset() {
+        this.gameScreens.remove(STATE.GAME);
+        this.gameScreens.put(STATE.GAME, new GameScreen(app));
     }
 }

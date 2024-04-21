@@ -25,7 +25,7 @@ public class HUD implements Disposable {
     static Label scoreLabel;
 
     public HUD(SpriteBatch batch) {
-        worldTimer = 300;
+        worldTimer = 180;
         timeCount = 0;
         score = 0;
 
