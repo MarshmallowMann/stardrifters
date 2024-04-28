@@ -43,7 +43,7 @@ public class GameScreen extends AbstractScreen {
         return chatHistory;
     }
 
-    ArrayList<String> chatHistory = ClientProgram.getChatHistory();
+    ArrayList<String> chatHistory = ClientProgram.chatHistory;
     // Box2D
     World world;
     Box2DDebugRenderer b2dr;
@@ -150,7 +150,12 @@ public class GameScreen extends AbstractScreen {
             String message = textField.getText();
             textField.setText("");
             //aSystem.out.println("Sending message: " + message);
-            app.clientProgram.sendMessage(message, Application.playerName);
+            try {
+                app.clientProgram.sendMessageToServer(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
         for (Box box : boxes) {
             // listen for enter press

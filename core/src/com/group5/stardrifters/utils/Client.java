@@ -1,5 +1,7 @@
 package com.group5.stardrifters.utils;
 
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import com.group5.stardrifters.Application;
 
 import java.io.*;
@@ -8,10 +10,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-public class ClientProgram {
+public class Client {
     private static final int PORT = 8888;
     private static final String SERVER_ADDRESS = "localhost";
-    public static ArrayList<String> chatHistory =  new ArrayList<>();
     private static DatagramSocket socket;
     private static InetAddress serverAddress;
 
@@ -22,11 +23,8 @@ public class ClientProgram {
         Thread receiveThread = new Thread(() -> {
             try {
 				System.out.println("Client started on port " + PORT);
-
-
-                sendMessageToServer("Connected to the Server!");
+                sendMessageToServer("Hello, server!");
                 receiveMessages();
-
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -40,7 +38,6 @@ public class ClientProgram {
         }
     }
 
-
     public void receiveMessages() throws IOException, ClassNotFoundException {
         byte[] buffer = new byte[1024];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
@@ -50,14 +47,10 @@ public class ClientProgram {
             ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
             ObjectInputStream ois = new ObjectInputStream(bais);
             Message message = (Message) ois.readObject();
+
             if(message instanceof PacketMessage) {
                 PacketMessage packetMessage = (PacketMessage) message;
                 System.out.println(packetMessage.getName() + ": " + packetMessage.getText());
-
-                chatHistory.add(packetMessage.getName() + ": " + packetMessage.getText());
-                            if (chatHistory.size() > 5) {
-                chatHistory.remove(0);
-            }
             } else if (message instanceof NameMessage) {
                 NameMessage nameMessage = (NameMessage) message;
                 Application.playerName = nameMessage.getName();
@@ -68,19 +61,14 @@ public class ClientProgram {
         }
     }
 
-    public static void sendMessageToServer(String message) throws IOException {
+    private static void sendMessageToServer(String message) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
-        if (Application.playerName == null) {
-            Application.playerName = "SERVER";
-        }
         oos.writeObject(new PacketMessage(message, Application.playerName));
         byte[] buffer = baos.toByteArray();
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
         socket.send(packet);
     }
-
-
 }
 
 

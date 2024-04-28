@@ -57,13 +57,14 @@ public class Application extends Game {
         gsm = new GameScreenManager(this);
 
 //    Connect to client
-        try {
-            clientProgram.connect();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-
+        Thread clientThread = new Thread(() -> {
+            try {
+                clientProgram.connect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        clientThread.start();
     }
 
     @Override
