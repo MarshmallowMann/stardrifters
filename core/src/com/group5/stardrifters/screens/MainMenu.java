@@ -1,44 +1,65 @@
 package com.group5.stardrifters.screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.group5.stardrifters.Application;
-import com.group5.stardrifters.Stardrifters;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.group5.stardrifters.managers.GameScreenManager;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
-import javax.swing.*;
+import javax.swing.event.ChangeEvent;
 
 public class MainMenu extends AbstractScreen {
+    SpriteBatch batch = new SpriteBatch();
+    Texture bg = new Texture("main_menu_bg.png");
+    TextButton.TextButtonStyle buttonStyle = new TextButtonStyle();
+    Label title;
+    Table table;
 
     public MainMenu(final Application app) {
         super(app);
 
-        Label.LabelStyle font = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
-
-        Table table = new Table();
-        table.center();
+        table = new Table();
         table.setFillParent(true);
-
-        Label gameOver = new Label("Main Menu", font);
-        table.add(gameOver).expandX();
+        title = new Label("Star Drifters", new Label.LabelStyle(new BitmapFont(Gdx.files.internal("Press_start.fnt")), Color.WHITE));
+        title.setFontScale(1.75f);
+        buttonStyle.font = new BitmapFont(Gdx.files.internal("Orbitron.fnt"));
+        TextButton playButton = new TextButton("Play", buttonStyle);
+        playButton.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        app.gsm.setScreen(GameScreenManager.STATE.GAME);
+                    }
+                }
+        );
+        TextButton exitButton = new TextButton("Exit", buttonStyle);
+        exitButton.addListener(new ClickListener() {
+                                   @Override
+                                   public void clicked(InputEvent event, float x, float y) {
+                                       Gdx.app.exit();
+                                   }
+                               }
+        );
+        table.add(title);
+        table.getCell(title).spaceBottom(150);
         table.row();
-
+        table.add(playButton).right();
+        table.getCell(playButton).spaceBottom(15);
+        table.row();
+        table.add(exitButton).right();
         stage.addActor(table);
     }
 
     @Override
     public void show() {
-
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -46,14 +67,19 @@ public class MainMenu extends AbstractScreen {
 
     }
 
+
     @Override
     public void render(float delta) {
-        if(Gdx.input.justTouched()){
-            app.gsm.setScreen(GameScreenManager.STATE.GAME);
-        }
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.begin();
+        batch.draw(bg, 0, 0);
+        batch.end();
         stage.draw();
+
+    }
+
+    @Override
+    public void resize(int width, int height) {
+
     }
 
     @Override
@@ -69,5 +95,10 @@ public class MainMenu extends AbstractScreen {
     @Override
     public void hide() {
 
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
     }
 }
