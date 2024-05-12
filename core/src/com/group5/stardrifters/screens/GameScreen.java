@@ -20,16 +20,14 @@ import com.group5.stardrifters.managers.GameScreenManager;
 import com.group5.stardrifters.objects.Box;
 import com.group5.stardrifters.objects.Circle;
 import com.group5.stardrifters.objects.Food;
-import com.group5.stardrifters.utils.B2DBodyBuilder;
-import com.group5.stardrifters.utils.ClientProgram;
-import com.group5.stardrifters.utils.MyContactListener;
-import com.group5.stardrifters.utils.MyTextInputListener;
+import com.group5.stardrifters.utils.*;
 
 
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
 
@@ -61,6 +59,8 @@ public class GameScreen extends AbstractScreen {
     boolean shouldMoveDynamicBody = false;
     // RayHandler
      RayHandler rayHandler;
+
+     ArrayList<GameObject> bodies = new ArrayList<GameObject>();
 
 
 
@@ -144,6 +144,17 @@ public class GameScreen extends AbstractScreen {
 
         app.batch.setProjectionMatrix(camera.combined);
         app.shapeBatch.setProjectionMatrix(camera.combined);
+
+        if (Objects.equals(Application.playerName, "Player2")) {
+            //        store all box bodies
+            for (Box box : boxes) {
+                bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
+            }
+            // sync the bodies with the server
+            ClientProgram.syncBodies(bodies);
+        }
+
+
     }
 
     @Override
@@ -202,7 +213,31 @@ public class GameScreen extends AbstractScreen {
                     break;
                 }
             }
+             bodies = new ArrayList<GameObject>();
+            for (Box box : boxes) {
+                bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
+            }
+            ClientProgram.syncBodies(bodies);
         }
+
+//        If syncGamePackets is not empty, sync the game state
+        if (!ClientProgram.syncGamePackets.isEmpty()) {
+            System.out.println("Syncing game state");
+            ArrayList<GameObject> bodies = ClientProgram.syncGamePackets.get(0).getBodies();
+            for (GameObject body : bodies) {
+                for (Box box : boxes) {
+                    if (box.id.equals(body.getObjectName())) {
+                        box.body.setTransform(body.getPosition(), body.getRotation());
+                        box.body.setLinearVelocity(body.getVelocity());
+                        box.body.setAngularVelocity(body.getAngularVelocity());
+                        break;
+                    }
+                }
+            }
+            ClientProgram.syncGamePackets.remove(0);
+        }
+
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             ClientProgram.sendControlMessageToServer("Impulse");
         }

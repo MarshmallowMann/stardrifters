@@ -9,11 +9,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.group5.stardrifters.managers.GameScreenManager;
 import com.group5.stardrifters.utils.ClientProgram;
 import com.group5.stardrifters.utils.MyTextInputListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class Application extends Game {
@@ -46,6 +48,7 @@ public class Application extends Game {
 
 
     Texture bg;
+
 
     @Override
     public void create() {

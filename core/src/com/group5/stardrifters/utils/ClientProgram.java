@@ -1,5 +1,6 @@
 package com.group5.stardrifters.utils;
 
+import com.badlogic.gdx.physics.box2d.Body;
 import com.group5.stardrifters.Application;
 
 import java.io.*;
@@ -16,7 +17,21 @@ public class ClientProgram {
     private static DatagramSocket socket;
     private static InetAddress serverAddress;
     public static ArrayList<String> moveHistory = new ArrayList<>();
+    public static ArrayList<SyncGamePacket> syncGamePackets = new ArrayList<SyncGamePacket>();
     public static int playerCount = 0;
+
+    public static void syncBodies(ArrayList<GameObject> bodies) {
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos);
+                oos.writeObject(new SyncGamePacket(bodies));
+                byte[] buffer = baos.toByteArray();
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
+                socket.send(packet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
 
     public void connect() throws IOException {
         socket = new DatagramSocket();
@@ -74,6 +89,11 @@ public class ClientProgram {
                 GameStateMessage gameStateMessage = (GameStateMessage) message;
                 System.out.println("Player count: " + gameStateMessage.getPlayerCount());
                 playerCount = gameStateMessage.getPlayerCount();
+            } else if (message instanceof SyncGamePacket) {
+                SyncGamePacket syncGamePacket = (SyncGamePacket) message;
+                syncGamePackets.add(syncGamePacket);
+                System.out.println("Syncing game state");
+
             }
 
         }

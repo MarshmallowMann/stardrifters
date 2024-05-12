@@ -73,6 +73,9 @@ public class Server {
         ControlMessage controlMessage = (ControlMessage) message;
 
         broadcastControlToAllClients(clientSocketAddress, controlMessage.getText(), controlMessage.getName());
+    } else if (message instanceof SyncGamePacket) {
+        SyncGamePacket syncGamePacket = (SyncGamePacket) message;
+        broadcastToAllClients(clientSocketAddress, syncGamePacket);
     }
         // handle other types of messages here
 }
@@ -92,6 +95,13 @@ public class Server {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(gameStateMessage);
+            buffer = baos.toByteArray();
+        } else if (message instanceof SyncGamePacket) {
+            SyncGamePacket syncGamePacket = (SyncGamePacket) message;
+            System.out.println("Broadcasting sync game packet");
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(syncGamePacket);
             buffer = baos.toByteArray();
         }
 
