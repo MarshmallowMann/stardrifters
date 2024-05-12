@@ -174,8 +174,20 @@ public class GameScreen extends AbstractScreen {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
+
+        // Sync the game state 10 frames per second
+        if (Gdx.graphics.getFrameId() % 10 == 0) {
+            //store all box bodies
+            for (Box box : boxes) {
+                bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
+            }
+            // sync the bodies with the server
+            ClientProgram.syncBodies(bodies);
+            bodies.clear();
+        }
+
+
         for (Box box : boxes) {
             Vector2 boxPosition = box.body.getPosition();
             Vector2 direction = circlePosition.cpy().sub(boxPosition);
@@ -183,7 +195,9 @@ public class GameScreen extends AbstractScreen {
             if (distance > 0) direction.nor();
             if (box.hit) {
                 //app.clientProgram.sendMessage( box.id + "has eaten food!. Score" + box.score);
-                box.respawn(camera);}
+                box.respawn(camera);
+
+            }
             float forceMagnitude = (G * 15f* box.body.getMass()) / (distance * distance);
             // Apply the gravitational force to the rectangle body
             Vector2 force = direction.scl(forceMagnitude);
