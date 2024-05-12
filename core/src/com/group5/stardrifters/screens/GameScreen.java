@@ -177,7 +177,7 @@ public class GameScreen extends AbstractScreen {
         }
 
         // Sync the game state 10 frames per second
-        if (Gdx.graphics.getFrameId() % 10 == 0) {
+        if (Objects.equals(Application.playerName, "Player1") &&  (Gdx.graphics.getFrameId() % 60 == 0)) {
             //store all box bodies
             for (Box box : boxes) {
                 bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));

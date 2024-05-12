@@ -10,7 +10,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 public class ClientProgram {
-    private static final int PORT = 8888;
+    private static final int PORT = 9000;
     private static final String SERVER_ADDRESS = "localhost";
     public static ArrayList<String> chatHistory =  new ArrayList<>();
     // Move history (object)

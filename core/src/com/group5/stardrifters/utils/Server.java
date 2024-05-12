@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Server {
-    private static final int PORT = 8888;
+    private static final int PORT = 9000;
     private static DatagramSocket socket;
     private static List<SocketAddress> clients = new ArrayList<>();
     static ArrayList<String> playerNames = new ArrayList<>();
