@@ -227,11 +227,6 @@ public class GameScreen extends AbstractScreen {
                     break;
                 }
             }
-             bodies = new ArrayList<GameObject>();
-            for (Box box : boxes) {
-                bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
-            }
-            ClientProgram.syncBodies(bodies);
         }
 
 //        If syncGamePackets is not empty, sync the game state
