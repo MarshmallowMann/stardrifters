@@ -62,6 +62,8 @@ public class GameScreen extends AbstractScreen {
     // RayHandler
      RayHandler rayHandler;
 
+
+
     public GameScreen(final Application app) {
         super(app);
 
@@ -73,6 +75,9 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     public void show() {
+         // Player count
+        int playerCount = ClientProgram.playerCount;
+
         MyTextInputListener Textlistener = new MyTextInputListener();
         Gdx.input.getTextInput(Textlistener, "Dialog Title", "Initial Textfield Value", "Hint Value");
         world = new World(new Vector2(0, 0f), false);
@@ -89,7 +94,7 @@ public class GameScreen extends AbstractScreen {
          Color[] colors = new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE};
 
         circle = new Circle(world, camera.viewportWidth/2, camera.viewportHeight/2, 16f, "circle");
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < playerCount; i++) {
             Box box = new Box(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32, "Player" + (i+1), app);
             box.respawn(camera);
             Vector2 linearForce = new Vector2(0, 1000);

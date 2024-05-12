@@ -9,13 +9,14 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 public class ClientProgram {
-    private static final int PORT = 9000;
+    private static final int PORT = 8888;
     private static final String SERVER_ADDRESS = "localhost";
     public static ArrayList<String> chatHistory =  new ArrayList<>();
     // Move history (object)
     private static DatagramSocket socket;
     private static InetAddress serverAddress;
     public static ArrayList<String> moveHistory = new ArrayList<>();
+    public static int playerCount = 0;
 
     public void connect() throws IOException {
         socket = new DatagramSocket();
@@ -69,6 +70,10 @@ public class ClientProgram {
                 ControlMessage controlMessage = (ControlMessage) message;
                 System.out.println("mover: " + controlMessage.getName());
                 moveHistory.add(controlMessage.getName());
+            } else if (message instanceof GameStateMessage) {
+                GameStateMessage gameStateMessage = (GameStateMessage) message;
+                System.out.println("Player count: " + gameStateMessage.getPlayerCount());
+                playerCount = gameStateMessage.getPlayerCount();
             }
 
         }
