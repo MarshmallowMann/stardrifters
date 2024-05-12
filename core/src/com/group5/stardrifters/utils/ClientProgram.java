@@ -10,8 +10,8 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 public class ClientProgram {
-    private static final int PORT = 9000;
-    private static final String SERVER_ADDRESS = "localhost";
+    private static int PORT = 0;
+    private static String SERVER_ADDRESS = "";
     public static ArrayList<String> chatHistory =  new ArrayList<>();
     // Move history (object)
     private static DatagramSocket socket;
@@ -33,7 +33,9 @@ public class ClientProgram {
             }
     }
 
-    public void connect() throws IOException {
+    public void connect(int port, String address) throws IOException {
+        PORT = port;
+        SERVER_ADDRESS = address;
         socket = new DatagramSocket();
         serverAddress = InetAddress.getByName(SERVER_ADDRESS);
 
@@ -124,7 +126,7 @@ public class ClientProgram {
 
     }
 
-
+//    public void set
 
 }
 

@@ -59,15 +59,7 @@ public class Application extends Game {
         shapeBatch = new ShapeRenderer();
         gsm = new GameScreenManager(this);
 
-//    Connect to client
-        Thread clientThread = new Thread(() -> {
-            try {
-                clientProgram.connect();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        clientThread.start();
+
     }
 
     @Override
