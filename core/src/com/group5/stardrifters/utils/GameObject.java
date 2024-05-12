@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.io.Serializable;
 
-public class GameObject implements Serializable {
+public class GameObject extends Message implements Serializable  {
     private static final long serialVersionUID = 1L;
 
     // The position, velocity, rotation, and angular velocity for this game object

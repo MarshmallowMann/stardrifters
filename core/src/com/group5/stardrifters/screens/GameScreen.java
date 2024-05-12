@@ -145,7 +145,7 @@ public class GameScreen extends AbstractScreen {
         app.batch.setProjectionMatrix(camera.combined);
         app.shapeBatch.setProjectionMatrix(camera.combined);
 
-        if (Objects.equals(Application.playerName, "Player2")) {
+        if (Objects.equals(Application.playerName, "Player1")) {
             //        store all box bodies
             for (Box box : boxes) {
                 bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
@@ -177,7 +177,7 @@ public class GameScreen extends AbstractScreen {
         }
 
         // Sync the game state 10 frames per second
-        if (Objects.equals(Application.playerName, "Player1") &&  (Gdx.graphics.getFrameId() % 60 == 0)) {
+        if (Objects.equals(Application.playerName, "Player1") &&  (Gdx.graphics.getFrameId() % 10 == 0)) {
             //store all box bodies
             for (Box box : boxes) {
                 bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
@@ -195,7 +195,9 @@ public class GameScreen extends AbstractScreen {
             if (distance > 0) direction.nor();
             if (box.hit) {
                 //app.clientProgram.sendMessage( box.id + "has eaten food!. Score" + box.score);
-                box.respawn(camera);
+                if (Application.playerName.equals("Player1")) {
+                    box.respawn(camera);
+                }
 
             }
             float forceMagnitude = (G * 15f* box.body.getMass()) / (distance * distance);
@@ -228,8 +230,20 @@ public class GameScreen extends AbstractScreen {
                 }
             }
         }
-
-        for (Box box : boxes) {
+if (!ClientProgram.gameObjects.isEmpty()) {
+    // get the box object from the game object
+    GameObject gameObject = ClientProgram.gameObjects.get(0);
+    for (Box box : boxes) {
+        if (box.id.equals(gameObject.getObjectName())) {
+            box.body.setTransform(gameObject.getPosition(), gameObject.getRotation());
+            box.body.setLinearVelocity(gameObject.getVelocity());
+            box.body.setAngularVelocity(gameObject.getAngularVelocity());
+            break;
+        }
+    }
+    ClientProgram.gameObjects.remove(0);
+} else {
+for (Box box : boxes) {
     box.prevPosition = box.body.getPosition().cpy();
     box.prevVelocity = box.body.getLinearVelocity().cpy();
 }
@@ -266,6 +280,7 @@ if (!ClientProgram.syncGamePackets.isEmpty()) {
     }
     ClientProgram.syncGamePackets.remove(0);
 }
+
 // Step 3: In each frame, gradually move the Box object from its current position and velocity towards the target position and velocity
 for (Box box : boxes) {
     if (box.targetPosition != null && box.targetVelocity != null) {
@@ -275,6 +290,11 @@ for (Box box : boxes) {
         box.body.setLinearVelocity(newVelocity);
     }
 }
+}
+
+
+
+
 
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {

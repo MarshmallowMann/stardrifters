@@ -76,6 +76,9 @@ public class Server {
     } else if (message instanceof SyncGamePacket) {
         SyncGamePacket syncGamePacket = (SyncGamePacket) message;
         broadcastToAllClients(clientSocketAddress, syncGamePacket);
+    } else if (message instanceof GameObject) {
+        GameObject gameObject = (GameObject) message;
+        broadcastToAllClients(clientSocketAddress, gameObject);
     }
         // handle other types of messages here
 }
@@ -102,6 +105,13 @@ public class Server {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(syncGamePacket);
+            buffer = baos.toByteArray();
+        } else if (message instanceof GameObject) {
+            GameObject gameObject = (GameObject) message;
+            System.out.println("Broadcasting game object");
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(gameObject);
             buffer = baos.toByteArray();
         }
 

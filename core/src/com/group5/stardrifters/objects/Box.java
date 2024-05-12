@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.group5.stardrifters.Application;
 import com.group5.stardrifters.utils.B2DBodyBuilder;
+import com.group5.stardrifters.utils.GameObject;
 
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
 
@@ -26,6 +27,8 @@ public class Box {
         this.body.setUserData(this);
         this.score = 100;
         this.id = id;
+        this.app = app;
+
 
 
     }
@@ -75,9 +78,12 @@ public class Box {
         this.body.setActive(false);
         body.setActive(true);
         Vector2 location = randomLocation(camera);
-//        System.out.println("Respawning boxId:" + id + " at " + location);
 
-        body.setTransform(location, 0);
+//        System.out.println("Respawning boxId:" + id + " at " + location);
+        // create a game object that will be sent to the server
+        // this object will contain the box id and the new location
+        GameObject gameObject = new GameObject(location, this.body.getLinearVelocity(), (float) (Math.random() * 360), 0,  id);
+        app.clientProgram.sendGameObject(gameObject);
     }
 
 

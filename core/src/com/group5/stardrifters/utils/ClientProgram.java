@@ -18,6 +18,7 @@ public class ClientProgram {
     private static InetAddress serverAddress;
     public static ArrayList<String> moveHistory = new ArrayList<>();
     public static ArrayList<SyncGamePacket> syncGamePackets = new ArrayList<SyncGamePacket>();
+    public static ArrayList<GameObject> gameObjects = new ArrayList<>();
     public static int playerCount = 0;
 
     public static void syncBodies(ArrayList<GameObject> bodies) {
@@ -96,6 +97,10 @@ public class ClientProgram {
                 syncGamePackets.add(syncGamePacket);
                 System.out.println("Syncing game state");
 
+            } else if (message instanceof GameObject) {
+                GameObject gameObject = (GameObject) message;
+                gameObjects.add(gameObject);
+                System.out.println("Received game object");
             }
 
         }
@@ -126,6 +131,19 @@ public class ClientProgram {
 
     }
 
+
+    public void sendGameObject(GameObject gameObject) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(gameObject);
+            byte[] buffer = baos.toByteArray();
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
+            socket.send(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 //    public void set
 
 }
