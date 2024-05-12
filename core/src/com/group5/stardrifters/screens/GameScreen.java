@@ -229,22 +229,52 @@ public class GameScreen extends AbstractScreen {
             }
         }
 
+        for (Box box : boxes) {
+    box.prevPosition = box.body.getPosition().cpy();
+    box.prevVelocity = box.body.getLinearVelocity().cpy();
+}
+
 //        If syncGamePackets is not empty, sync the game state
-        if (!ClientProgram.syncGamePackets.isEmpty()) {
-            System.out.println("Syncing game state");
-            ArrayList<GameObject> bodies = ClientProgram.syncGamePackets.get(0).getBodies();
-            for (GameObject body : bodies) {
-                for (Box box : boxes) {
-                    if (box.id.equals(body.getObjectName())) {
-                        box.body.setTransform(body.getPosition(), body.getRotation());
-                        box.body.setLinearVelocity(body.getVelocity());
-                        box.body.setAngularVelocity(body.getAngularVelocity());
-                        break;
-                    }
-                }
+//        if (!ClientProgram.syncGamePackets.isEmpty()) {
+//            System.out.println("Syncing game state");
+//            ArrayList<GameObject> bodies = ClientProgram.syncGamePackets.get(0).getBodies();
+//            for (GameObject body : bodies) {
+//                for (Box box : boxes) {
+//                    if (box.id.equals(body.getObjectName())) {
+//                        box.body.setTransform(body.getPosition(), body.getRotation());
+//                        box.body.setLinearVelocity(body.getVelocity());
+//                        box.body.setAngularVelocity(body.getAngularVelocity());
+//                        break;
+//                    }
+//                }
+//            }
+//            ClientProgram.syncGamePackets.remove(0);
+//        }
+        // Step 2: When you receive a new position and velocity from the server, set them as the target position and velocity
+if (!ClientProgram.syncGamePackets.isEmpty()) {
+    System.out.println("Syncing game state");
+    ArrayList<GameObject> bodies = ClientProgram.syncGamePackets.get(0).getBodies();
+    for (GameObject body : bodies) {
+        for (Box box : boxes) {
+            if (box.id.equals(body.getObjectName())) {
+                box.targetPosition = body.getPosition();
+                box.targetVelocity = body.getVelocity();
+                box.body.setAngularVelocity(body.getAngularVelocity());
+                break;
             }
-            ClientProgram.syncGamePackets.remove(0);
         }
+    }
+    ClientProgram.syncGamePackets.remove(0);
+}
+// Step 3: In each frame, gradually move the Box object from its current position and velocity towards the target position and velocity
+for (Box box : boxes) {
+    if (box.targetPosition != null && box.targetVelocity != null) {
+        Vector2 newPosition = box.prevPosition.lerp(box.targetPosition, delta);
+        Vector2 newVelocity = box.prevVelocity.lerp(box.targetVelocity, delta);
+        box.body.setTransform(newPosition, box.body.getAngle());
+        box.body.setLinearVelocity(newVelocity);
+    }
+}
 
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {

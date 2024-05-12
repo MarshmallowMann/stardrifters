@@ -15,12 +15,18 @@ public class Box {
     public String id;
     public Boolean hit = false;
     public Application app;
+    // New fields for motion interpolation
+    public Vector2 prevPosition;
+    public Vector2 prevVelocity;
+    public Vector2 targetPosition;
+    public Vector2 targetVelocity;
 
     public Box(World world, float X, float Y, float width, float height, String id, Application app) {
         this.body = B2DBodyBuilder.createBox(world, X, Y, width, height);
         this.body.setUserData(this);
         this.score = 100;
         this.id = id;
+
 
     }
 
