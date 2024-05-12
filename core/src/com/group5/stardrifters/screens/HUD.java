@@ -29,35 +29,38 @@ public class HUD implements Disposable {
     Label chatHistory;
 
     public HUD(SpriteBatch batch) {
-        worldTimer = 180;
-        timeCount = 0;
-        score = 0;
-        viewport = new FitViewport(Application.V_WIDTH, Application.V_HEIGHT, new OrthographicCamera());
-        this.stage = new Stage(viewport, batch);
+          worldTimer = 180;
+    timeCount = 0;
+    score = 0;
+    viewport = new FitViewport(Application.V_WIDTH, Application.V_HEIGHT, new OrthographicCamera());
+    this.stage = new Stage(viewport, batch);
 
-        Table table = new Table();
-        table.top();
-        table.setFillParent(true);
+    Table table = new Table();
+    table.top();
+    table.setFillParent(true);
 
-        countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        scoreLabel = new Label(String.format("%02d", score), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+    countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+    scoreLabel = new Label(String.format("%02d", score), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
-        //add a label for a string
-        table.add(countdownLabel).expandX().padTop(10);
-        table.add(scoreLabel).expandX().padTop(10);
-        //get text input from user
-        this.stage = new Stage();
-        TextField.TextFieldStyle style = new TextField.TextFieldStyle();
-        style.font = new BitmapFont();
-        style.fontColor = Color.WHITE;
-        TextField usernameTextField = new TextField("", style);
-        usernameTextField.setPosition(80,8);
-        usernameTextField.setSize(200, 14);
-        stage.addActor(usernameTextField);            // <-- Actor now on stage
-        Gdx.input.setInputProcessor(stage);
-        table.row();  // Add a new row to the table
-        stage.addActor(table);
-        this.userInputField = usernameTextField;
+    table.add(countdownLabel).expandX().padTop(10);
+    table.add(scoreLabel).expandX().padTop(10);
+
+    TextField.TextFieldStyle style = new TextField.TextFieldStyle();
+    style.font = new BitmapFont();
+    style.fontColor = Color.WHITE;
+    TextField usernameTextField = new TextField("", style);
+    usernameTextField.setPosition(80,8);
+    usernameTextField.setSize(200, 14);
+    usernameTextField.setMessageText("Enter your messages");
+
+    stage.addActor(usernameTextField); // Add the TextField to the stage
+
+   // Gdx.input.setInputProcessor(stage); // Set the input processor to the stage
+
+    table.row();  // Add a new row to the table
+    stage.addActor(table);
+    this.userInputField = usernameTextField;
+
 
     }
 

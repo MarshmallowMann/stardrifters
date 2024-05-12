@@ -43,6 +43,8 @@ public class MainMenu extends AbstractScreen {
         exitButton.addListener(new ClickListener() {
                                    @Override
                                    public void clicked(InputEvent event, float x, float y) {
+                                       // dispose the game properly
+                                       app.dispose();
                                        Gdx.app.exit();
                                    }
                                }

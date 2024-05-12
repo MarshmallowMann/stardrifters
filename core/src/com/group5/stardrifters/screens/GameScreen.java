@@ -151,7 +151,7 @@ public class GameScreen extends AbstractScreen {
             textField.setText("");
             //aSystem.out.println("Sending message: " + message);
             try {
-                app.clientProgram.sendMessageToServer(message);
+                ClientProgram.sendMessageToServer(message);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -226,9 +226,9 @@ public class GameScreen extends AbstractScreen {
         }
         font.draw(batch, Application.playerName + ": ", 20, 20);
         batch.end();
-        hud.stage.draw();
         stage.draw();
-
+        hud.stage.draw();
+        Gdx.input.setInputProcessor(hud.stage);
         if(gameOver()) {
             app.gsm.setScreen(GameScreenManager.STATE.GAMEOVER);
         }

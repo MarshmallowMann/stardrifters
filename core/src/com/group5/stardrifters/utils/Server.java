@@ -67,7 +67,7 @@ public class Server {
 
         broadcastToAllClients(clientSocketAddress, packetMessage.getText(), packetMessage.getName());
     }
-    // handle other types of messages here
+        // handle other types of messages here
 }
 
     private static void broadcastToAllClients(SocketAddress senderSocketAddress, String message, String name) throws IOException {
