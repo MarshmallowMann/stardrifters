@@ -12,8 +12,10 @@ public class ClientProgram {
     private static final int PORT = 8888;
     private static final String SERVER_ADDRESS = "localhost";
     public static ArrayList<String> chatHistory =  new ArrayList<>();
+    public static int playerCount = 1;
     private static DatagramSocket socket;
     private static InetAddress serverAddress;
+
 
     public void connect() throws IOException {
         socket = new DatagramSocket();
@@ -63,6 +65,10 @@ public class ClientProgram {
                 Application.playerName = nameMessage.getName();
                 System.out.println("Received name: " + nameMessage.getName());
                 System.out.println("Player name: " + Application.playerName);
+            } else if (message instanceof GameStateMessage) {
+                GameStateMessage gameStateMessage = (GameStateMessage) message;
+                playerCount = gameStateMessage.getPlayerCount();
+                System.out.println("Player count: " + playerCount);
             }
 
         }

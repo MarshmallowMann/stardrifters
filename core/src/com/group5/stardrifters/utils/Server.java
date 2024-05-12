@@ -51,6 +51,8 @@ public class Server {
         socket.send(packet);
 
         broadcastToClient(clientSocketAddress, new PacketMessage("Welcome to the server!", "SERVER"));
+        broadcastToAllClients(clientSocketAddress, new PacketMessage(name + " has joined the server.", "SERVER"));
+        broadcastToAllClients(clientSocketAddress, new GameStateMessage(clients.size()));
         System.out.println("Client connected: " + socketAddress.getAddress().getHostAddress() + ":" + socketAddress.getPort());
     }
 
@@ -65,22 +67,33 @@ public class Server {
     if (message instanceof PacketMessage) {
         PacketMessage packetMessage = (PacketMessage) message;
 
-        broadcastToAllClients(clientSocketAddress, packetMessage.getText(), packetMessage.getName());
+        broadcastToAllClients(clientSocketAddress, packetMessage);
     }
         // handle other types of messages here
 }
 
-    private static void broadcastToAllClients(SocketAddress senderSocketAddress, String message, String name) throws IOException {
-        PacketMessage packetMessage = new PacketMessage(message, name);
-        System.out.println("Broadcasting message: " + packetMessage.getText());
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(new PacketMessage(message, name));
-        byte[] buffer = baos.toByteArray();
+    private static void broadcastToAllClients(SocketAddress senderSocketAddress, Message message) throws IOException {
+        byte[] buffer = null;
+        if (message instanceof PacketMessage) {
+            PacketMessage packetMessage = (PacketMessage) message;
+            System.out.println("Broadcasting message: " + packetMessage.getText());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(packetMessage);
+            buffer = baos.toByteArray();
+        } else if (message instanceof GameStateMessage) {
+            GameStateMessage gameStateMessage = (GameStateMessage) message;
+            System.out.println("Broadcasting game state player count: " + gameStateMessage.getPlayerCount());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(gameStateMessage);
+            buffer = baos.toByteArray();
+        }
+
         for (SocketAddress clientSocketAddress : clients) {
 //            if (clientSocketAddress.equals(senderSocketAddress)) {
-                InetSocketAddress socketAddress = (InetSocketAddress) clientSocketAddress;
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, socketAddress.getAddress(), socketAddress.getPort());
+            InetSocketAddress socketAddress = (InetSocketAddress) clientSocketAddress;
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, socketAddress.getAddress(), socketAddress.getPort());
                 socket.send(packet);
 //            }
         }
