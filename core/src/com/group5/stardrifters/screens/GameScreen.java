@@ -26,6 +26,7 @@ import com.group5.stardrifters.utils.MyContactListener;
 import com.group5.stardrifters.utils.MyTextInputListener;
 
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,8 +43,10 @@ public class GameScreen extends AbstractScreen {
     public ArrayList<String> getChatHistory() {
         return chatHistory;
     }
+    public ArrayList<String> moveHistory() { return  moveHistory;}
 
     ArrayList<String> chatHistory = ClientProgram.chatHistory;
+    ArrayList<String> moveHistory = ClientProgram.moveHistory;
     // Box2D
     World world;
     Box2DDebugRenderer b2dr;
@@ -86,8 +89,8 @@ public class GameScreen extends AbstractScreen {
          Color[] colors = new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE};
 
         circle = new Circle(world, camera.viewportWidth/2, camera.viewportHeight/2, 16f, "circle");
-        for (int i = 0; i < 2; i++) {
-            Box box = new Box(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32, "box" + i, app);
+        for (int i = 0; i < 1; i++) {
+            Box box = new Box(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32, "Player" + (i+1), app);
             box.respawn(camera);
             Vector2 linearForce = new Vector2(0, 1000);
             box.body.applyForceToCenter(linearForce, true);
@@ -139,7 +142,7 @@ public class GameScreen extends AbstractScreen {
     }
 
     @Override
-    public void update(float delta) {
+    public void update(float delta) throws IOException {
 //        Get chat history from client program
        world.step(1f /Application.APP_FPS, 6, 2);
         Vector2 circlePosition = circle.body.getPosition();
@@ -158,7 +161,6 @@ public class GameScreen extends AbstractScreen {
 
         }
         for (Box box : boxes) {
-            // listen for enter press
             Vector2 boxPosition = box.body.getPosition();
             Vector2 direction = circlePosition.cpy().sub(boxPosition);
             float distance = direction.len();
@@ -180,15 +182,24 @@ public class GameScreen extends AbstractScreen {
         }
 
     //    On space bar click, apply impulse to the box away from the circle
+        // if moveHistory is not empty, apply impulse to the box away from the circle
+        if (!moveHistory.isEmpty()) {
+            //print move history
+            System.out.println(moveHistory);
+            for (Box box : boxes) {
+                if (box.id.equals(moveHistory.get(0))) {
+                    Vector2 boxPosition = box.body.getPosition();
+                    Vector2 impulseDirection = boxPosition.cpy().sub(circlePosition);
+                    impulseDirection.nor();
+                    float impulseMagnitude = 25f;
+                    box.body.applyLinearImpulse(impulseDirection.scl(impulseMagnitude), boxPosition, true);
+                    moveHistory.remove(0);
+                    break;
+                }
+            }
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            // Calculate impulse direction away from the circle
-            Vector2 boxPosition = boxes.get(0).body.getPosition();
-            Vector2 impulseDirection = boxPosition.cpy().sub(circlePosition);
-            impulseDirection.nor();
-            // Calculate impulse magnitude
-            float impulseMagnitude = 25f;
-            // Apply impulse to the box
-            boxes.get(0).body.applyLinearImpulse(impulseDirection.scl(impulseMagnitude), boxPosition, true);
+            ClientProgram.sendControlMessageToServer("Impulse");
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             // Calculate impulse direction away from the circle
@@ -200,6 +211,7 @@ public class GameScreen extends AbstractScreen {
             // Apply impulse to the box
             boxes.get(1).body.applyLinearImpulse(impulseDirection.scl(impulseMagnitude), boxPosition, true);
         }
+        //generate impulse based on server message
 
         stage.act(delta);
         hud.update(delta);
@@ -279,4 +291,6 @@ public class GameScreen extends AbstractScreen {
     public void setShouldMoveDynamicBody(boolean shouldMoveDynamicBody) {
         this.shouldMoveDynamicBody = shouldMoveDynamicBody;
     }
+
+
 }

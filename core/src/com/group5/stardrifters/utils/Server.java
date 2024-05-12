@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Server {
-    private static final int PORT = 8888;
+    private static final int PORT = 9000;
     private static DatagramSocket socket;
     private static List<SocketAddress> clients = new ArrayList<>();
     static ArrayList<String> playerNames = new ArrayList<>();
@@ -68,6 +68,11 @@ public class Server {
         PacketMessage packetMessage = (PacketMessage) message;
 
         broadcastToAllClients(clientSocketAddress, packetMessage);
+    } else if (message instanceof ControlMessage) {
+
+        ControlMessage controlMessage = (ControlMessage) message;
+
+        broadcastControlToAllClients(clientSocketAddress, controlMessage.getText(), controlMessage.getName());
     }
         // handle other types of messages here
 }
@@ -96,6 +101,22 @@ public class Server {
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, socketAddress.getAddress(), socketAddress.getPort());
                 socket.send(packet);
 //            }
+        }
+    }
+
+    private static void broadcastControlToAllClients(SocketAddress senderSocketAddress, String message, String name) throws IOException {
+        ControlMessage controlMessage = new ControlMessage(message, name);
+        System.out.println("Broadcasting control message: " + controlMessage.getText());
+        System.out.println("Broadcasting control name: " + controlMessage.getName());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(new ControlMessage(message, name));
+        byte[] buffer = baos.toByteArray();
+        for (SocketAddress clientSocketAddress : clients) {
+//            if (clientSocketAddress.equals(senderSocketAddress)) {
+                InetSocketAddress socketAddress = (InetSocketAddress) clientSocketAddress;
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, socketAddress.getAddress(), socketAddress.getPort());
+                socket.send(packet);
         }
     }
 

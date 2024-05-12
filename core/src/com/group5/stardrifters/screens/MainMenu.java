@@ -36,6 +36,8 @@ public class MainMenu extends AbstractScreen {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         app.gsm.setScreen(GameScreenManager.STATE.GAME);
+                        app.gsm.disposeScreen(GameScreenManager.STATE.SPLASH);
+
                     }
                 }
         );

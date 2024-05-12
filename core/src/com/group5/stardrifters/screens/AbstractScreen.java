@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.group5.stardrifters.Application;
 
+import java.io.IOException;
+
 public abstract class AbstractScreen implements Screen {
 
     protected final Application app;
@@ -18,11 +20,15 @@ public abstract class AbstractScreen implements Screen {
         stage = new Stage();
     }
 
-    public abstract void update(float delta);
+    public abstract void update(float delta) throws IOException;
 
     @Override
     public void render(float delta) {
-        update(delta);
+        try {
+            update(delta);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         Gdx.gl.glClearColor(.25f, .25f, .25f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

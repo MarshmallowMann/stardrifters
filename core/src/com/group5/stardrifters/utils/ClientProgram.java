@@ -9,13 +9,13 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 public class ClientProgram {
-    private static final int PORT = 8888;
+    private static final int PORT = 9000;
     private static final String SERVER_ADDRESS = "localhost";
     public static ArrayList<String> chatHistory =  new ArrayList<>();
-    public static int playerCount = 1;
+    // Move history (object)
     private static DatagramSocket socket;
     private static InetAddress serverAddress;
-
+    public static ArrayList<String> moveHistory = new ArrayList<>();
 
     public void connect() throws IOException {
         socket = new DatagramSocket();
@@ -65,10 +65,10 @@ public class ClientProgram {
                 Application.playerName = nameMessage.getName();
                 System.out.println("Received name: " + nameMessage.getName());
                 System.out.println("Player name: " + Application.playerName);
-            } else if (message instanceof GameStateMessage) {
-                GameStateMessage gameStateMessage = (GameStateMessage) message;
-                playerCount = gameStateMessage.getPlayerCount();
-                System.out.println("Player count: " + playerCount);
+            } else if (message instanceof ControlMessage) {
+                ControlMessage controlMessage = (ControlMessage) message;
+                System.out.println("mover: " + controlMessage.getName());
+                moveHistory.add(controlMessage.getName());
             }
 
         }
@@ -85,6 +85,20 @@ public class ClientProgram {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
         socket.send(packet);
     }
+
+    public static void sendControlMessageToServer(String message) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        if (Application.playerName == null) {
+            Application.playerName = "SERVER";
+        }
+        oos.writeObject(new ControlMessage(message, Application.playerName));
+        byte[] buffer = baos.toByteArray();
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
+        socket.send(packet);
+
+    }
+
 
 
 }

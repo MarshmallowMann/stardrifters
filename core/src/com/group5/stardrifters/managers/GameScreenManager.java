@@ -48,6 +48,10 @@ public class GameScreenManager {
         }
     }
 
+    public void disposeScreen(STATE screen) {
+        gameScreens.get(screen).dispose();
+    }
+
     public void reset() {
         this.gameScreens.remove(STATE.GAME);
         this.gameScreens.put(STATE.GAME, new GameScreen(app));
