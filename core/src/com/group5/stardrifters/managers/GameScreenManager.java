@@ -14,8 +14,9 @@ public class GameScreenManager {
 
     public enum STATE {
         SPLASH,
-        CONNECT,
         MENU,
+        CONNECT,
+        LOBBY,
         GAME,
         PAUSE,
         GAMEOVER
@@ -25,15 +26,16 @@ public class GameScreenManager {
         this.app = app;
 
         initGameScreens();
-        setScreen(STATE.CONNECT);
+        setScreen(STATE.LOBBY);
     }
 
     private void initGameScreens() {
         // Add game screens here
         this.gameScreens = new HashMap<STATE, AbstractScreen>();
         this.gameScreens.put(STATE.SPLASH, new Splash(app));
-        this.gameScreens.put(STATE.CONNECT, new ConnectScreen(app));
         this.gameScreens.put(STATE.MENU, new MainMenu(app));
+        this.gameScreens.put(STATE.CONNECT, new ConnectScreen(app));
+        this.gameScreens.put(STATE.LOBBY, new Lobby(app));
         this.gameScreens.put(STATE.GAME, new GameScreen(app));
         this.gameScreens.put(STATE.GAMEOVER, new GameOver(app));
     }

@@ -55,7 +55,7 @@ public class Splash extends AbstractScreen {
             alpha = 3 - elapsedTime;
         } else {
             alpha = 0f;
-            app.gsm.setScreen(GameScreenManager.STATE.MENU);
+            app.gsm.setScreen(GameScreenManager.STATE.CONNECT);
         }
 
         Gdx.gl.glClearColor(0f, 0f, 0f, 0);
