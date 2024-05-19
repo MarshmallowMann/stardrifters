@@ -2,7 +2,10 @@ package com.group5.stardrifters.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -17,6 +20,8 @@ public class Lobby extends AbstractScreen {
     private int playerCount;
     private Label waitingLabel, playerCountLabel;
     private Table buttonTable;
+    SpriteBatch batch = new SpriteBatch();
+    Texture bg = new Texture("galaxy_bg.png");
 
     public Lobby(final Application app) {
         super(app);
@@ -25,9 +30,6 @@ public class Lobby extends AbstractScreen {
         table.center();
         table.setFillParent(true);
 
-        TextField.TextFieldStyle textFieldStyle = new TextField.TextFieldStyle();
-        textFieldStyle.font = new BitmapFont(Gdx.files.internal("Orbitron.fnt"));
-        textFieldStyle.fontColor = Color.WHITE;
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = new BitmapFont(Gdx.files.internal("Orbitron.fnt"));
         labelStyle.fontColor = Color.WHITE;
@@ -75,6 +77,9 @@ public class Lobby extends AbstractScreen {
 
     @Override
     public void render(float delta) {
+        batch.begin();
+        batch.draw(bg, 0, 0);
+        batch.end();
         stage.draw();
     }
 

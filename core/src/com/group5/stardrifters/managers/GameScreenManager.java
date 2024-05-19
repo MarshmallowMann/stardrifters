@@ -26,7 +26,7 @@ public class GameScreenManager {
         this.app = app;
 
         initGameScreens();
-        setScreen(STATE.LOBBY);
+        setScreen(STATE.SPLASH);
     }
 
     private void initGameScreens() {
