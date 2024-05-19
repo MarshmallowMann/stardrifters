@@ -61,7 +61,7 @@ public class GameScreen extends AbstractScreen {
      RayHandler rayHandler;
 
      ArrayList<GameObject> bodies = new ArrayList<GameObject>();
-
+    boolean allAreFoods = true;
 
 
     public GameScreen(final Application app) {
@@ -94,7 +94,7 @@ public class GameScreen extends AbstractScreen {
          Color[] colors = new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE};
 
         circle = new Circle(world, camera.viewportWidth/2, camera.viewportHeight/2, 16f, "circle");
-        for (int i = 0; i < playerCount; i++) {
+        for (int i = 0; i < 2; i++) {
             Box box = new Box(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32, "Player" + (i+1), app);
             box.respawn(camera);
             Vector2 linearForce = new Vector2(0, 1000);
@@ -113,9 +113,10 @@ public class GameScreen extends AbstractScreen {
         }
 
         for (int i = 0; i < 10; i++) {
-            Food food = new Food(world, camera.viewportWidth/2, camera.viewportHeight/2, 16, 16);
+            Food food = new Food(world, camera.viewportWidth/2, camera.viewportHeight/2, 16, 16, "Food" + (i+1),app);
             food.respawn(camera);
             foods.add(food);
+
             // Create a PointLight for each Food and attach it to the Food's body
             PointLight pointLight = new PointLight(rayHandler, 50); // Smaller number for less light
 
@@ -147,10 +148,18 @@ public class GameScreen extends AbstractScreen {
 
         if (Objects.equals(Application.playerName, "Player1")) {
             //        store all box bodies
+            for (Food food : foods) {
+                bodies.add(new GameObject(food.body.getPosition(), new Vector2(0,0), 0, 0, food.id));
+            }
             for (Box box : boxes) {
                 bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
             }
+
             // sync the bodies with the server
+            //print the id of the bodies
+            for (GameObject body : bodies) {
+                System.out.println(body.getObjectName());
+            }
             ClientProgram.syncBodies(bodies);
         }
 
@@ -182,10 +191,14 @@ public class GameScreen extends AbstractScreen {
             for (Box box : boxes) {
                 bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
             }
+            for (Food food : foods) {
+                bodies.add(new GameObject(food.body.getPosition(), new Vector2(0,0), 0, 0, food.id));
+            }
             // sync the bodies with the server
             ClientProgram.syncBodies(bodies);
             bodies.clear();
         }
+
 
 
         for (Box box : boxes) {
@@ -277,6 +290,13 @@ if (!ClientProgram.syncGamePackets.isEmpty()) {
                 break;
             }
         }
+        for (Food food : foods) {
+            if (food.id.equals(body.getObjectName())) {
+                System.out.println("Syncing food");
+                food.body.setTransform(body.getPosition(), body.getRotation());
+                break;
+            }
+        }
     }
     ClientProgram.syncGamePackets.remove(0);
 }
@@ -291,11 +311,6 @@ for (Box box : boxes) {
     }
 }
 }
-
-
-
-
-
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             ClientProgram.sendControlMessageToServer("Impulse");

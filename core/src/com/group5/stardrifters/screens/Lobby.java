@@ -50,7 +50,7 @@ public class Lobby extends AbstractScreen {
             }
         });
         buttonTable.add(playButton).expandX();
-        buttonTable.setVisible(false);
+        buttonTable.setVisible(true);
 
         table.add(waitingLabel).expandX();
         table.row();
@@ -72,7 +72,8 @@ public class Lobby extends AbstractScreen {
         playerCount = ClientProgram.playerCount;
         playerCountLabel.setText(playerCount + "/8");
 
-        buttonTable.setVisible(playerCount >= 4);
+        buttonTable.setVisible(playerCount >= 2);
+        System.out.println("playerCount: " + playerCount);
     }
 
     @Override

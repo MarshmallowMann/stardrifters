@@ -10,8 +10,8 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 public class ClientProgram {
-    private static int PORT = 0;
-    private static String SERVER_ADDRESS = "";
+    private static int PORT = 9000;
+    private static String SERVER_ADDRESS = "localhost";
     public static ArrayList<String> chatHistory =  new ArrayList<>();
     // Move history (object)
     private static DatagramSocket socket;
@@ -26,6 +26,19 @@ public class ClientProgram {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(baos);
                 oos.writeObject(new SyncGamePacket(bodies));
+                byte[] buffer = baos.toByteArray();
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
+                socket.send(packet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
+
+    public static void syncFood(ArrayList<GameObject> food) {
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos);
+                oos.writeObject(new SyncGamePacket(food));
                 byte[] buffer = baos.toByteArray();
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
                 socket.send(packet);
@@ -63,7 +76,7 @@ public class ClientProgram {
 
 
     public void receiveMessages() throws IOException, ClassNotFoundException {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[65507];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
         while (true) {
@@ -100,7 +113,8 @@ public class ClientProgram {
             } else if (message instanceof GameObject) {
                 GameObject gameObject = (GameObject) message;
                 gameObjects.add(gameObject);
-                System.out.println("Received game object");
+                //print id of game object
+                System.out.println("Game object id: " + gameObject.getObjectName());
             }
 
         }

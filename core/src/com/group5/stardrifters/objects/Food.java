@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
+import com.group5.stardrifters.Application;
 import com.group5.stardrifters.utils.B2DBodyBuilder;
 
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
@@ -12,10 +13,12 @@ public class Food {
     public Body body;
     public String id;
     public Boolean hit = false;
-
-    public Food(World world, float X, float Y, float width, float height) {
+    public Application app;
+    public Food(World world, float X, float Y, float width, float height, String id, Application app) {
         this.body = B2DBodyBuilder.createTriangle(world, X, Y, width, height);
         this.body.setUserData(this);
+        this.id = id;
+        this.app = app;
     }
 
     public void hit() {
@@ -28,10 +31,9 @@ public class Food {
         this.hit = false;
         // hide the box for 2 seconds
         this.body.setActive(false);
-        body.setActive(true);
+        this.body.setActive(true);
         Vector2 location = randomLocation(camera);
 //        System.out.println("Respawning food at " + location);
-
         body.setTransform(location, 0);
     }
 
