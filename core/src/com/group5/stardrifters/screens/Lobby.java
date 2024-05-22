@@ -17,7 +17,7 @@ import com.group5.stardrifters.managers.GameScreenManager;
 import com.group5.stardrifters.utils.ClientProgram;
 
 public class Lobby extends AbstractScreen {
-    private int playerCount;
+//    private int playerCount = ClientProgram.playerCount;
     private Label waitingLabel, playerCountLabel;
     private Table buttonTable;
     SpriteBatch batch = new SpriteBatch();
@@ -35,7 +35,7 @@ public class Lobby extends AbstractScreen {
         labelStyle.fontColor = Color.WHITE;
 
         waitingLabel  = new Label("Waiting for other players (Min. of 4)", labelStyle);
-        playerCountLabel = new Label(playerCount + "/8", labelStyle);
+        playerCountLabel = new Label(ClientProgram.playerCount + "/8", labelStyle);
 
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.font = new BitmapFont(Gdx.files.internal("Orbitron.fnt"));
@@ -46,6 +46,7 @@ public class Lobby extends AbstractScreen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                System.out.println("Clicked");
                 app.gsm.setScreen(GameScreenManager.STATE.GAME);
             }
         });
@@ -64,19 +65,19 @@ public class Lobby extends AbstractScreen {
 
     @Override
     public void show() {
-
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void update(float delta) {
-        playerCount = ClientProgram.playerCount;
-        playerCountLabel.setText(playerCount + "/8");
+        System.out.println("/8");
 
-        buttonTable.setVisible(playerCount >= 4);
     }
 
     @Override
     public void render(float delta) {
+        playerCountLabel.setText(ClientProgram.playerCount + "/8");
+        buttonTable.setVisible(ClientProgram.playerCount >= 4);
         batch.begin();
         batch.draw(bg, 0, 0);
         batch.end();
