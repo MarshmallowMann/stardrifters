@@ -8,6 +8,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class ClientProgram {
     private static int PORT = 9000;
@@ -20,6 +22,7 @@ public class ClientProgram {
     public static ArrayList<SyncGamePacket> syncGamePackets = new ArrayList<SyncGamePacket>();
     public static ArrayList<GameObject> gameObjects = new ArrayList<>();
     public static int playerCount = 0;
+    public static int timeLeft = 160;
 
     public static void syncBodies(ArrayList<GameObject> bodies) {
             try {
@@ -36,6 +39,7 @@ public class ClientProgram {
 
     public static void syncFood(ArrayList<GameObject> food) {
             try {
+                System.out.println("sending food to server");
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(baos);
                 oos.writeObject(new SyncGamePacket(food));
@@ -76,7 +80,8 @@ public class ClientProgram {
 
 
     public void receiveMessages() throws IOException, ClassNotFoundException {
-        byte[] buffer = new byte[65507];
+        byte[] buffer = new byte[1024];
+        byte[] buffer2 = new byte[65507];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
         while (true) {
@@ -108,15 +113,19 @@ public class ClientProgram {
             } else if (message instanceof SyncGamePacket) {
                 SyncGamePacket syncGamePacket = (SyncGamePacket) message;
                 syncGamePackets.add(syncGamePacket);
-                System.out.println("Syncing game state");
+                //System.out.println("Syncing game state");
 
             } else if (message instanceof GameObject) {
                 GameObject gameObject = (GameObject) message;
                 gameObjects.add(gameObject);
                 //print id of game object
                 System.out.println("Game object id: " + gameObject.getObjectName());
+            } else if (message instanceof TimeMessage) {
+                TimeMessage timeMessage = (TimeMessage) message;
+                long milliseconds = timeMessage.getTime();
+                long seconds = milliseconds / 1000;
+                System.out.println("Seconds: " + (timeLeft - seconds));
             }
-
         }
     }
 
