@@ -8,6 +8,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ClientProgram {
     private static int PORT = 0;
@@ -20,6 +21,7 @@ public class ClientProgram {
     public static ArrayList<SyncGamePacket> syncGamePackets = new ArrayList<SyncGamePacket>();
     public static ArrayList<GameObject> gameObjects = new ArrayList<>();
     public static int playerCount = 0;
+    public static boolean start = false;
 
     public static void syncBodies(ArrayList<GameObject> bodies) {
             try {
@@ -88,6 +90,13 @@ public class ClientProgram {
                 ControlMessage controlMessage = (ControlMessage) message;
                 System.out.println("mover: " + controlMessage.getName());
                 moveHistory.add(controlMessage.getName());
+            } else if (message instanceof GameStartMessage) {
+                GameStartMessage gameStartMessage = (GameStartMessage) message;
+                System.out.println("Game started!");
+                if(Objects.equals(gameStartMessage.getText(), "StartGame")) {
+                    System.out.println("pass");
+                    start = true;
+                }
             } else if (message instanceof GameStateMessage) {
                 GameStateMessage gameStateMessage = (GameStateMessage) message;
                 System.out.println("Player count: " + gameStateMessage.getPlayerCount());
@@ -104,6 +113,18 @@ public class ClientProgram {
             }
 
         }
+    }
+
+    public static void sendStartGameRequest( String message) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        if (Application.playerName == null) {
+            Application.playerName = "SERVER";
+        }
+        oos.writeObject(new GameStartMessage(message, Application.playerName));
+        byte[] buffer = baos.toByteArray();
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
+        socket.send(packet);
     }
 
     public static void sendMessageToServer(String message) throws IOException {
