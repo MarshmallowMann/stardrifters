@@ -2,7 +2,6 @@ package com.group5.stardrifters.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,14 +9,15 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.group5.stardrifters.Application;
 import com.group5.stardrifters.managers.GameScreenManager;
 import com.group5.stardrifters.utils.ClientProgram;
 
+import java.io.IOException;
+
 public class Lobby extends AbstractScreen {
-    private int playerCount;
+    // private int playerCount = ClientProgram.playerCount;
     private Label waitingLabel, playerCountLabel;
     private Table buttonTable;
     SpriteBatch batch = new SpriteBatch();
@@ -34,8 +34,8 @@ public class Lobby extends AbstractScreen {
         labelStyle.font = new BitmapFont(Gdx.files.internal("Orbitron.fnt"));
         labelStyle.fontColor = Color.WHITE;
 
-        waitingLabel  = new Label("Waiting for other players (Min. of 4)", labelStyle);
-        playerCountLabel = new Label(playerCount + "/8", labelStyle);
+        waitingLabel = new Label("Waiting for other players (Min. of 4)", labelStyle);
+        playerCountLabel = new Label(ClientProgram.playerCount + "/8", labelStyle);
 
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.font = new BitmapFont(Gdx.files.internal("Orbitron.fnt"));
@@ -46,7 +46,11 @@ public class Lobby extends AbstractScreen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                app.gsm.setScreen(GameScreenManager.STATE.GAME);
+                try {
+                    ClientProgram.sendStartGameRequest("StartGame");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
         buttonTable.add(playButton).expandX();
@@ -58,26 +62,26 @@ public class Lobby extends AbstractScreen {
         table.row();
         table.add(buttonTable).expandX().padTop(10f);
 
-
         stage.addActor(table);
     }
 
     @Override
     public void show() {
-
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void update(float delta) {
-        playerCount = ClientProgram.playerCount;
-        playerCountLabel.setText(playerCount + "/8");
 
-        buttonTable.setVisible(playerCount >= 2);
-        System.out.println("playerCount: " + playerCount);
     }
 
     @Override
     public void render(float delta) {
+        if (ClientProgram.start) {
+            app.gsm.setScreen(GameScreenManager.STATE.GAME);
+        }
+        playerCountLabel.setText(ClientProgram.playerCount + "/8");
+        buttonTable.setVisible(ClientProgram.playerCount >= 4);
         batch.begin();
         batch.draw(bg, 0, 0);
         batch.end();

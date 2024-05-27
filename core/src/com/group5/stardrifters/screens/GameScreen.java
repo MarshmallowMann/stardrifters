@@ -22,7 +22,6 @@ import com.group5.stardrifters.objects.Circle;
 import com.group5.stardrifters.objects.Food;
 import com.group5.stardrifters.utils.*;
 
-
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -41,7 +40,10 @@ public class GameScreen extends AbstractScreen {
     public ArrayList<String> getChatHistory() {
         return chatHistory;
     }
-    public ArrayList<String> moveHistory() { return  moveHistory;}
+
+    public ArrayList<String> moveHistory() {
+        return moveHistory;
+    }
 
     ArrayList<String> chatHistory = ClientProgram.chatHistory;
     ArrayList<String> moveHistory = ClientProgram.moveHistory;
@@ -58,12 +60,11 @@ public class GameScreen extends AbstractScreen {
     float G = 30f;
     boolean shouldMoveDynamicBody = false;
     // RayHandler
-     RayHandler rayHandler;
+    RayHandler rayHandler;
 
-     ArrayList<GameObject> bodies = new ArrayList<GameObject>();
-     ArrayList<GameObject> foodBodies = new ArrayList<GameObject>();
+    ArrayList<GameObject> bodies = new ArrayList<GameObject>();
+    ArrayList<GameObject> foodBodies = new ArrayList<GameObject>();
     boolean allAreFoods = true;
-
 
     public GameScreen(final Application app) {
         super(app);
@@ -76,7 +77,7 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     public void show() {
-         // Player count
+        // Player count
         int playerCount = ClientProgram.playerCount;
 
         MyTextInputListener Textlistener = new MyTextInputListener();
@@ -91,12 +92,13 @@ public class GameScreen extends AbstractScreen {
         DirectionalLight light3 = new DirectionalLight(rayHandler, 100, Color.BLUE, 225);
         DirectionalLight light4 = new DirectionalLight(rayHandler, 100, Color.BLUE, 315);
 
-         // Array of colors
-         Color[] colors = new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE};
+        // Array of colors
+        Color[] colors = new Color[] { Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE };
 
-        circle = new Circle(world, camera.viewportWidth/2, camera.viewportHeight/2, 16f, "circle");
+        circle = new Circle(world, camera.viewportWidth / 2, camera.viewportHeight / 2, 16f, "circle");
         for (int i = 0; i < 1; i++) {
-            Box box = new Box(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32, "Player" + (i+1), app);
+            Box box = new Box(world, camera.viewportWidth / 2, camera.viewportHeight / 2, 32, 32, "Player" + (i + 1),
+                    app);
             box.respawn(camera);
             Vector2 linearForce = new Vector2(0, 1000);
             box.body.applyForceToCenter(linearForce, true);
@@ -108,13 +110,14 @@ public class GameScreen extends AbstractScreen {
             pointLight.setDistance(2.5f);
             pointLight.attachToBody(box.body);
 
-             // Set the color of the PointLight to a color from the array
+            // Set the color of the PointLight to a color from the array
             pointLight.setColor(colors[i % colors.length]);
             boxes.add(box);
         }
 
         for (int i = 0; i < 10; i++) {
-            Food food = new Food(world, camera.viewportWidth/2, camera.viewportHeight/2, 16, 16, "Food" + (i+1),app);
+            Food food = new Food(world, camera.viewportWidth / 2, camera.viewportHeight / 2, 16, 16, "Food" + (i + 1),
+                    app);
             food.respawn(camera);
             foods.add(food);
 
@@ -123,7 +126,7 @@ public class GameScreen extends AbstractScreen {
 
             // reduce light intensity
             pointLight.setDistance(1.5f);
-//            Make it more intense
+            // Make it more intense
             pointLight.setSoftnessLength(0f);
             pointLight.attachToBody(food.body);
 
@@ -131,7 +134,6 @@ public class GameScreen extends AbstractScreen {
             pointLight.setColor(Color.ORANGE);
 
         }
-
 
         PointLight pointLight = new PointLight(rayHandler, 100);
         pointLight.attachToBody(circle.body);
@@ -148,18 +150,19 @@ public class GameScreen extends AbstractScreen {
         app.shapeBatch.setProjectionMatrix(camera.combined);
 
         if (Objects.equals(Application.playerName, "Player1")) {
-            //        store all box bodies
+            // store all box bodies
 
             for (Box box : boxes) {
-                bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
+                bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(),
+                        box.body.getAngularVelocity(), box.id));
             }
 
             for (Food food : foods) {
-                foodBodies.add(new GameObject(food.body.getPosition(), new Vector2(0,0), 0, 0, food.id));
+                foodBodies.add(new GameObject(food.body.getPosition(), new Vector2(0, 0), 0, 0, food.id));
             }
 
             // sync the bodies with the server
-            //print the id of the bodies
+            // print the id of the bodies
             for (GameObject body : bodies) {
                 System.out.println(body.getObjectName());
             }
@@ -170,8 +173,8 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     public void update(float delta) throws IOException {
-//        Get chat history from client program
-       world.step(1f /Application.APP_FPS, 6, 2);
+        // Get chat history from client program
+        world.step(1f / Application.APP_FPS, 6, 2);
         Vector2 circlePosition = circle.body.getPosition();
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             // if the chatHistory array is more than 5, remove the first element
@@ -179,7 +182,7 @@ public class GameScreen extends AbstractScreen {
             TextField textField = hud.userInputField;
             String message = textField.getText();
             textField.setText("");
-            //aSystem.out.println("Sending message: " + message);
+            // aSystem.out.println("Sending message: " + message);
             try {
                 ClientProgram.sendMessageToServer(message);
             } catch (Exception e) {
@@ -188,10 +191,12 @@ public class GameScreen extends AbstractScreen {
         }
 
         // Sync the game state 10 frames per second
-        if (Objects.equals(Application.playerName, "Player1") &&  (Gdx.graphics.getFrameId() % 10 == 0)) {
-            //store all box bodies
+        if (Objects.equals(Application.playerName, "Player1") && (Gdx.graphics.getFrameId() % 10 == 0)) {
+            // store all box bodies
             for (Box box : boxes) {
-                bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
+                bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(),
+                        box.body.getAngularVelocity(), box.id));
+                ClientProgram.sendScore(box.score, box.id);
             }
             // sync the bodies with the server
             ClientProgram.syncBodies(bodies);
@@ -199,11 +204,11 @@ public class GameScreen extends AbstractScreen {
         }
 
         if (Objects.equals(Application.playerName, "Player1")) {
-            //store all box bodies
+            // store all box bodies
             for (Food food : foods) {
-                if(food.hit){
+                if (food.hit) {
                     food.respawn(camera);
-                    foodBodies.add(new GameObject(food.body.getPosition(), new Vector2(0,0), 0, 0, food.id));
+                    foodBodies.add(new GameObject(food.body.getPosition(), new Vector2(0, 0), 0, 0, food.id));
                     ClientProgram.syncFood(foodBodies);
 
                 }
@@ -212,19 +217,19 @@ public class GameScreen extends AbstractScreen {
             // sync the bodies with the server
         }
 
-
         for (Box box : boxes) {
             Vector2 boxPosition = box.body.getPosition();
             Vector2 direction = circlePosition.cpy().sub(boxPosition);
             float distance = direction.len();
-            if (distance > 0) direction.nor();
+            if (distance > 0)
+                direction.nor();
             if (box.hit) {
                 System.out.println("Box " + box.id + " has been hit!");
                 if (Application.playerName.equals("Player1")) {
                     box.respawnDelay(camera, ClientProgram.timeLeft);
                 }
             }
-            float forceMagnitude = (G * 15f* box.body.getMass()) / (distance * distance);
+            float forceMagnitude = (G * 15f * box.body.getMass()) / (distance * distance);
             // Apply the gravitational force to the rectangle body
             Vector2 force = direction.scl(forceMagnitude);
 
@@ -232,11 +237,10 @@ public class GameScreen extends AbstractScreen {
             // Apply y axis linear force so that it orbits the circle
         }
 
-
-    //    On space bar click, apply impulse to the box away from the circle
+        // On space bar click, apply impulse to the box away from the circle
         // if moveHistory is not empty, apply impulse to the box away from the circle
         if (!moveHistory.isEmpty()) {
-            //print move history
+            // print move history
             System.out.println(moveHistory);
             for (Box box : boxes) {
                 if (box.id.equals(moveHistory.get(0))) {
@@ -250,95 +254,86 @@ public class GameScreen extends AbstractScreen {
                 }
             }
         }
-if (!ClientProgram.gameObjects.isEmpty()) {
-    // get the box object from the game object
-    GameObject gameObject = ClientProgram.gameObjects.get(0);
-    for (Box box : boxes) {
-        if (box.id.equals(gameObject.getObjectName())) {
-            box.body.setTransform(gameObject.getPosition(), gameObject.getRotation());
-            box.body.setLinearVelocity(gameObject.getVelocity());
-            box.body.setAngularVelocity(gameObject.getAngularVelocity());
-            break;
-        }
-    }
-    ClientProgram.gameObjects.remove(0);
-} else {
-for (Box box : boxes) {
-    box.prevPosition = box.body.getPosition().cpy();
-    box.prevVelocity = box.body.getLinearVelocity().cpy();
-}
+        if (!ClientProgram.gameObjects.isEmpty()) {
+            // get the box object from the game object
+            GameObject gameObject = ClientProgram.gameObjects.get(0);
+            for (Box box : boxes) {
+                if (box.id.equals(gameObject.getObjectName())) {
+                    box.body.setTransform(gameObject.getPosition(), gameObject.getRotation());
+                    box.body.setLinearVelocity(gameObject.getVelocity());
+                    box.body.setAngularVelocity(gameObject.getAngularVelocity());
+                    break;
+                }
+            }
+            ClientProgram.gameObjects.remove(0);
+        } else {
+            for (Box box : boxes) {
+                box.prevPosition = box.body.getPosition().cpy();
+                box.prevVelocity = box.body.getLinearVelocity().cpy();
+            }
 
-//        If syncGamePackets is not empty, sync the game state
-//        if (!ClientProgram.syncGamePackets.isEmpty()) {
-//            System.out.println("Syncing game state");
-//            ArrayList<GameObject> bodies = ClientProgram.syncGamePackets.get(0).getBodies();
-//            for (GameObject body : bodies) {
-//                for (Box box : boxes) {
-//                    if (box.id.equals(body.getObjectName())) {
-//                        box.body.setTransform(body.getPosition(), body.getRotation());
-//                        box.body.setLinearVelocity(body.getVelocity());
-//                        box.body.setAngularVelocity(body.getAngularVelocity());
-//                        break;
-//                    }
-//                }
-//            }
-//            ClientProgram.syncGamePackets.remove(0);
-//        }
-        // Step 2: When you receive a new position and velocity from the server, set them as the target position and velocity
-if (!ClientProgram.syncGamePackets.isEmpty()) {
-    //System.out.println("Syncing game state");
-    ArrayList<GameObject> bodies = ClientProgram.syncGamePackets.get(0).getBodies();
-    for (GameObject body : bodies) {
-        for (Box box : boxes) {
-            if (box.id.equals(body.getObjectName())) {
-                box.targetPosition = body.getPosition();
-                box.targetVelocity = body.getVelocity();
-                box.body.setAngularVelocity(body.getAngularVelocity());
-                break;
+            // If syncGamePackets is not empty, sync the game state
+            // if (!ClientProgram.syncGamePackets.isEmpty()) {
+            // System.out.println("Syncing game state");
+            // ArrayList<GameObject> bodies =
+            // ClientProgram.syncGamePackets.get(0).getBodies();
+            // for (GameObject body : bodies) {
+            // for (Box box : boxes) {
+            // if (box.id.equals(body.getObjectName())) {
+            // box.body.setTransform(body.getPosition(), body.getRotation());
+            // box.body.setLinearVelocity(body.getVelocity());
+            // box.body.setAngularVelocity(body.getAngularVelocity());
+            // break;
+            // }
+            // }
+            // }
+            // ClientProgram.syncGamePackets.remove(0);
+            // }
+            // Step 2: When you receive a new position and velocity from the server, set
+            // them as the target position and velocity
+            if (!ClientProgram.syncGamePackets.isEmpty()) {
+                // System.out.println("Syncing game state");
+                ArrayList<GameObject> bodies = ClientProgram.syncGamePackets.get(0).getBodies();
+                for (GameObject body : bodies) {
+                    for (Box box : boxes) {
+                        if (box.id.equals(body.getObjectName())) {
+                            box.targetPosition = body.getPosition();
+                            box.targetVelocity = body.getVelocity();
+                            box.body.setAngularVelocity(body.getAngularVelocity());
+                            break;
+                        }
+                    }
+                    for (Food food : foods) {
+                        if (food.id.equals(body.getObjectName())) {
+                            // System.out.println("Syncing food");
+                            food.body.setTransform(body.getPosition(), body.getRotation());
+                            break;
+                        }
+                    }
+                }
+                ClientProgram.syncGamePackets.remove(0);
+            }
+
+            // Step 3: In each frame, gradually move the Box object from its current
+            // position and velocity towards the target position and velocity
+            for (Box box : boxes) {
+                if (box.targetPosition != null && box.targetVelocity != null) {
+                    Vector2 newPosition = box.prevPosition.lerp(box.targetPosition, delta);
+                    Vector2 newVelocity = box.prevVelocity.lerp(box.targetVelocity, delta);
+                    box.body.setTransform(newPosition, box.body.getAngle());
+                    box.body.setLinearVelocity(newVelocity);
+                }
             }
         }
-        for (Food food : foods) {
-            if (food.id.equals(body.getObjectName())) {
-                //System.out.println("Syncing food");
-                food.body.setTransform(body.getPosition(), body.getRotation());
-                break;
-            }
-        }
-    }
-    ClientProgram.syncGamePackets.remove(0);
-}
-
-// Step 3: In each frame, gradually move the Box object from its current position and velocity towards the target position and velocity
-for (Box box : boxes) {
-    if (box.targetPosition != null && box.targetVelocity != null) {
-        Vector2 newPosition = box.prevPosition.lerp(box.targetPosition, delta);
-        Vector2 newVelocity = box.prevVelocity.lerp(box.targetVelocity, delta);
-        box.body.setTransform(newPosition, box.body.getAngle());
-        box.body.setLinearVelocity(newVelocity);
-    }
-}
-}
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             ClientProgram.sendControlMessageToServer("Impulse");
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            // Calculate impulse direction away from the circle
-            Vector2 boxPosition = boxes.get(1).body.getPosition();
-            Vector2 impulseDirection = boxPosition.cpy().sub(circlePosition);
-            impulseDirection.nor();
-            // Calculate impulse magnitude
-            float impulseMagnitude = 15f;
-            // Apply impulse to the box
-            boxes.get(1).body.applyLinearImpulse(impulseDirection.scl(impulseMagnitude), boxPosition, true);
-        }
-        //generate impulse based on server message
-
+        // generate impulse based on server message
         stage.act(delta);
         hud.update(delta);
         this.camera.update();
     }
-
 
     @Override
     public void render(float delta) {
@@ -354,15 +349,15 @@ for (Box box : boxes) {
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         batch.begin();
 
-        for(int i = 1; i < chatHistory.size()+1; i++) {
-            font.draw(batch, chatHistory.get(i-1), 10, i*(-20) + offsetY );
+        for (int i = 1; i < chatHistory.size() + 1; i++) {
+            font.draw(batch, chatHistory.get(i - 1), 10, i * (-20) + offsetY);
         }
         font.draw(batch, Application.playerName + ": ", 20, 20);
         batch.end();
         stage.draw();
         hud.stage.draw();
         Gdx.input.setInputProcessor(hud.stage);
-        if(gameOver()) {
+        if (gameOver()) {
             app.gsm.setScreen(GameScreenManager.STATE.GAMEOVER);
         }
     }
@@ -396,7 +391,7 @@ for (Box box : boxes) {
         super.dispose();
         world.dispose();
         b2dr.dispose();
-        rayHandler.dispose();  // Dispose the RayHandler
+        rayHandler.dispose(); // Dispose the RayHandler
     }
 
     private void createWalls() {
@@ -412,6 +407,4 @@ for (Box box : boxes) {
     public void setShouldMoveDynamicBody(boolean shouldMoveDynamicBody) {
         this.shouldMoveDynamicBody = shouldMoveDynamicBody;
     }
-
-
 }

@@ -14,7 +14,6 @@ import java.util.TimerTask;
 
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
 
-
 public class Box {
     public Body body;
     public int score;
@@ -28,22 +27,12 @@ public class Box {
     public Vector2 targetVelocity;
     public boolean timePassed = false;
 
-
     public Box(World world, float X, float Y, float width, float height, String id, Application app) {
         this.body = B2DBodyBuilder.createBox(world, X, Y, width, height);
         this.body.setUserData(this);
-        this.score = 100;
+        this.score = 0;
         this.id = id;
         this.app = app;
-
-
-
-    }
-
-    //start a timer
-    public void startTimer(int timeLeft){
-        //start a timer
-
     }
 
     public void updateScore() {
@@ -63,25 +52,21 @@ public class Box {
     }
 
     public void hit() {
-//        System.out.println("Box " + this.id + " has been hit!");
+        // System.out.println("Box " + this.id + " has been hit!");
         // Send a message to the server that the box has been hit
-//
-         this.score--;
-//        System.out.println("Score: " + this.score);
 
-//        Send a message to the server that t he box has been hit
+        // System.out.println("Score: " + this.score);
 
+        // Send a message to the server that the box has been hit
 
         // respawn box in a random location
         this.hit = true;
     }
 
-    public void hitFood(){
-//        System.out.println("Box " + this.id + " has eaten food!");
-
+    public void hitFood() {
+        // System.out.println("Box " + this.id + " has eaten food!");
         this.score += 10;
-//        System.out.println("Score: " + this.score);
-
+        // System.out.println("Score: " + this.score);
     }
 
     public void respawn(OrthographicCamera camera) {
@@ -90,15 +75,16 @@ public class Box {
         // hide the box for 2 seconds
         Vector2 location = randomLocation(camera);
 
-//        System.out.println("Respawning boxId:" + id + " at " + location);
+        // System.out.println("Respawning boxId:" + id + " at " + location);
         // create a game object that will be sent to the server
         // this object will contain the box id and the new location
-        GameObject gameObject = new GameObject(location, this.body.getLinearVelocity(), (float) (Math.random() * 360), 0,  id);
+        GameObject gameObject = new GameObject(location, this.body.getLinearVelocity(), (float) (Math.random() * 360),
+                0, id);
         app.clientProgram.sendGameObject(gameObject);
     }
 
     public void respawnDelay(OrthographicCamera camera, int timeLeft) {
-        //start a timer
+        // start a timer
         hit = false;
         Timer timer = new Timer();
         System.out.println("Timer started");
@@ -111,7 +97,8 @@ public class Box {
                     if (timeToReachTarget >= 2000) {
                         System.out.println("Two seconds have passed");
                         Vector2 location = randomLocation(camera);
-                        GameObject gameObject = new GameObject(location, body.getLinearVelocity(), (float) (Math.random() * 360), 0,  id);
+                        GameObject gameObject = new GameObject(location, body.getLinearVelocity(),
+                                (float) (Math.random() * 360), 0, id);
                         app.clientProgram.sendGameObject(gameObject);
 
                         timer.cancel(); // Stop the timer
@@ -123,11 +110,7 @@ public class Box {
             }
         }, 0, 1000);
 
-
-
-
     }
-
 
     private Vector2 randomLocation(OrthographicCamera camera) {
         float x_min = 32 / PPM;
@@ -138,8 +121,9 @@ public class Box {
         float x = (float) (Math.random() * camera.viewportWidth) / PPM;
         float y = (float) (Math.random() * camera.viewportHeight) / PPM;
 
-        while(true) {
-            if((x > x_min && x < x_max ) && (y > y_min && y < y_max)) break;
+        while (true) {
+            if ((x > x_min && x < x_max) && (y > y_min && y < y_max))
+                break;
             else {
                 x = (float) Math.random() * camera.viewportWidth / PPM;
                 y = (float) Math.random() * camera.viewportHeight / PPM;

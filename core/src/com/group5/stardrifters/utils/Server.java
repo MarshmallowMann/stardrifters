@@ -1,7 +1,5 @@
 package com.group5.stardrifters.utils;
 
-import com.group5.stardrifters.Application;
-
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -90,13 +88,16 @@ public class Server {
 
     if (message instanceof PacketMessage) {
         PacketMessage packetMessage = (PacketMessage) message;
-
         broadcastToAllClients(clientSocketAddress, packetMessage);
     } else if (message instanceof ControlMessage) {
-
         ControlMessage controlMessage = (ControlMessage) message;
-
         broadcastControlToAllClients(clientSocketAddress, controlMessage.getText(), controlMessage.getName());
+    } else if (message instanceof GameStartMessage) {
+        GameStartMessage gameStartMessage = (GameStartMessage) message;
+        broadcastToAllClients(clientSocketAddress, gameStartMessage);
+    } else if (message instanceof ScoreMessage) {
+        ScoreMessage scoreMessage = (ScoreMessage) message;
+        broadcastToAllClients(clientSocketAddress, scoreMessage);
     } else if (message instanceof SyncGamePacket) {
         SyncGamePacket syncGamePacket = (SyncGamePacket) message;
         broadcastToAllClients(clientSocketAddress, syncGamePacket);
@@ -116,12 +117,26 @@ public class Server {
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(packetMessage);
             buffer = baos.toByteArray();
+        } else if (message instanceof GameStartMessage) {
+            GameStartMessage gameStartMessage = (GameStartMessage) message;
+            System.out.println("Broadcasting game start: " + gameStartMessage.getText());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(gameStartMessage);
+            buffer = baos.toByteArray();
         } else if (message instanceof GameStateMessage) {
             GameStateMessage gameStateMessage = (GameStateMessage) message;
             System.out.println("Broadcasting game state player count: " + gameStateMessage.getPlayerCount());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(gameStateMessage);
+            buffer = baos.toByteArray();
+        } else if (message instanceof ScoreMessage) {
+            ScoreMessage scoreMessage = (ScoreMessage) message;
+            System.out.println("Broadcasting score(" + scoreMessage.getScore() + ") to client: " + scoreMessage.getName());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(scoreMessage);
             buffer = baos.toByteArray();
         } else if (message instanceof SyncGamePacket) {
             SyncGamePacket syncGamePacket = (SyncGamePacket) message;
