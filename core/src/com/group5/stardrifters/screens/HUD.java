@@ -30,7 +30,7 @@ public class HUD implements Disposable {
     Label chatHistory;
 
     public HUD(SpriteBatch batch) {
-          worldTimer = 180;
+        worldTimer = ClientProgram.timeLeft;
     timeCount = 0;
     score = 0;
     viewport = new FitViewport(Application.V_WIDTH, Application.V_HEIGHT, new OrthographicCamera());

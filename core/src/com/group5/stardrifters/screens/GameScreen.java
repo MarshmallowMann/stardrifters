@@ -21,6 +21,7 @@ import com.group5.stardrifters.objects.Box;
 import com.group5.stardrifters.objects.Circle;
 import com.group5.stardrifters.objects.Food;
 import com.group5.stardrifters.utils.*;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -96,7 +97,7 @@ public class GameScreen extends AbstractScreen {
         Color[] colors = new Color[] { Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE };
 
         circle = new Circle(world, camera.viewportWidth / 2, camera.viewportHeight / 2, 16f, "circle");
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 2; i++) {
             Box box = new Box(world, camera.viewportWidth / 2, camera.viewportHeight / 2, 32, 32, "Player" + (i + 1),
                     app);
             box.respawn(camera);
@@ -216,17 +217,16 @@ public class GameScreen extends AbstractScreen {
             foodBodies.clear();
             // sync the bodies with the server
         }
-
         for (Box box : boxes) {
+
             Vector2 boxPosition = box.body.getPosition();
             Vector2 direction = circlePosition.cpy().sub(boxPosition);
             float distance = direction.len();
             if (distance > 0)
                 direction.nor();
             if (box.hit) {
-                System.out.println("Box " + box.id + " has been hit!");
                 if (Application.playerName.equals("Player1")) {
-                    box.respawnDelay(camera, ClientProgram.timeLeft);
+                    box.respawn(camera);
                 }
             }
             float forceMagnitude = (G * 15f * box.body.getMass()) / (distance * distance);

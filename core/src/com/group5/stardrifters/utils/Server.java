@@ -34,8 +34,16 @@ public class Server {
 
             if (!clients.contains(clientSocketAddress)) {
                 clients.add(clientSocketAddress);
-                if (clients.size() == 1){
-                    Timer timer = new Timer();
+                connected(clientSocketAddress);
+            } else {
+                received(clientSocketAddress, packet.getData());
+            }
+
+        }
+    }
+
+    public static void startTimer () {
+         Timer timer = new Timer();
                     System.out.println("Timer started");
                     startTime = System.currentTimeMillis();
                     timer.scheduleAtFixedRate(new TimerTask() {
@@ -49,13 +57,6 @@ public class Server {
                             }
                         }
                     }, 0, 1000);
-                }
-                connected(clientSocketAddress);
-            } else {
-                received(clientSocketAddress, packet.getData());
-            }
-
-        }
     }
 
     private static void connected(SocketAddress clientSocketAddress) throws IOException {
@@ -94,6 +95,7 @@ public class Server {
         broadcastControlToAllClients(clientSocketAddress, controlMessage.getText(), controlMessage.getName());
     } else if (message instanceof GameStartMessage) {
         GameStartMessage gameStartMessage = (GameStartMessage) message;
+        startTimer();
         broadcastToAllClients(clientSocketAddress, gameStartMessage);
     } else if (message instanceof ScoreMessage) {
         ScoreMessage scoreMessage = (ScoreMessage) message;

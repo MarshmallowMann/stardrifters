@@ -81,7 +81,7 @@ public class Lobby extends AbstractScreen {
             app.gsm.setScreen(GameScreenManager.STATE.GAME);
         }
         playerCountLabel.setText(ClientProgram.playerCount + "/8");
-        buttonTable.setVisible(ClientProgram.playerCount >= 4);
+        buttonTable.setVisible(ClientProgram.playerCount >= 2);
         batch.begin();
         batch.draw(bg, 0, 0);
         batch.end();
