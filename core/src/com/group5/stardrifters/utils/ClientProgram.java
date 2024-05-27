@@ -7,10 +7,7 @@ import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 public class ClientProgram {
     private static int PORT = 9000;
@@ -26,6 +23,7 @@ public class ClientProgram {
     public static boolean start = false;
     public static int score = 0;
     public static int timeLeft = 160;
+    public static TreeMap<String, Integer> leaderBoard = new TreeMap<String, Integer>(Collections.reverseOrder());
 
     public static void syncBodies(ArrayList<GameObject> bodies) {
         try {
@@ -118,6 +116,7 @@ public class ClientProgram {
                 playerCount = gameStateMessage.getPlayerCount();
             } else if (message instanceof ScoreMessage) {
                 ScoreMessage scoreMessage = (ScoreMessage) message;
+                leaderBoard.put(scoreMessage.getName(), scoreMessage.getScore());
                 if (Objects.equals(scoreMessage.getName(), Application.playerName)) {
                     System.out.println("Player name: " + scoreMessage.getName());
                     System.out.println("Player score: " + scoreMessage.getScore());

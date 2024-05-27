@@ -15,10 +15,14 @@ import com.group5.stardrifters.Application;
 import com.group5.stardrifters.Stardrifters;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.group5.stardrifters.managers.GameScreenManager;
+import com.group5.stardrifters.objects.Box;
+import com.group5.stardrifters.utils.ClientProgram;
 
 import javax.swing.*;
+import java.util.*;
 
 public class GameOver extends AbstractScreen {
+    private static final TreeMap<String, Integer> leaderBoard = ClientProgram.leaderBoard;
 
     public GameOver(final Application app) {
         super(app);
@@ -30,9 +34,15 @@ public class GameOver extends AbstractScreen {
         table.setFillParent(true);
 
         Label gameOver = new Label("GAME OVER", font);
-        Label playAgain = new Label("Jai won!", font);
+        Label playAgain = new Label("Click anywhere to exit", font);
+
         table.add(gameOver).expandX();
         table.row();
+        for (Map.Entry<String, Integer> entry : leaderBoard.entrySet()) {
+            System.out.println("pass");
+            table.add(new Label(entry.getKey() + ": " + entry.getValue(), font)).expandX().padTop(10f);
+            table.row();
+        }
         table.add(playAgain).expandX().padTop(10f);
 
         stage.addActor(table);
@@ -51,8 +61,8 @@ public class GameOver extends AbstractScreen {
     @Override
     public void render(float delta) {
         if(Gdx.input.justTouched()){
-            app.gsm.setScreen(GameScreenManager.STATE.MENU);
-            app.gsm.reset();
+            app.dispose();
+            Gdx.app.exit();
         }
         Gdx.gl.glClearColor(0f, 0f, 0f, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -72,5 +82,13 @@ public class GameOver extends AbstractScreen {
     @Override
     public void hide() {
 
+    }
+
+    public static class ScoreComparator implements Comparator<Box> {
+
+        @Override
+        public int compare(Box o1, Box o2) {
+            return o2.score - o1.score;
+        }
     }
 }
