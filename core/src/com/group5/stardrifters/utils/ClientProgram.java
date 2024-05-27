@@ -22,6 +22,7 @@ public class ClientProgram {
     public static ArrayList<GameObject> gameObjects = new ArrayList<>();
     public static int playerCount = 0;
     public static boolean start = false;
+    public static int score = 0;
 
     public static void syncBodies(ArrayList<GameObject> bodies) {
             try {
@@ -94,34 +95,52 @@ public class ClientProgram {
                 GameStartMessage gameStartMessage = (GameStartMessage) message;
                 System.out.println("Game started!");
                 if(Objects.equals(gameStartMessage.getText(), "StartGame")) {
-                    System.out.println("pass");
                     start = true;
                 }
             } else if (message instanceof GameStateMessage) {
                 GameStateMessage gameStateMessage = (GameStateMessage) message;
                 System.out.println("Player count: " + gameStateMessage.getPlayerCount());
                 playerCount = gameStateMessage.getPlayerCount();
+            } else if (message instanceof ScoreMessage) {
+                ScoreMessage scoreMessage = (ScoreMessage) message;
+                if (Objects.equals(scoreMessage.getName(), Application.playerName)) {
+                    System.out.println("Player name: " + scoreMessage.getName());
+                    System.out.println("Player score: " + scoreMessage.getScore());
+                    score = scoreMessage.getScore();
+                }
             } else if (message instanceof SyncGamePacket) {
                 SyncGamePacket syncGamePacket = (SyncGamePacket) message;
                 syncGamePackets.add(syncGamePacket);
-                System.out.println("Syncing game state");
+//                System.out.println("Syncing game state");
 
             } else if (message instanceof GameObject) {
                 GameObject gameObject = (GameObject) message;
                 gameObjects.add(gameObject);
-                System.out.println("Received game object");
+//                System.out.println("Received game object");
             }
 
         }
     }
 
-    public static void sendStartGameRequest( String message) throws IOException {
+    public static void sendStartGameRequest(String message) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         if (Application.playerName == null) {
             Application.playerName = "SERVER";
         }
         oos.writeObject(new GameStartMessage(message, Application.playerName));
+        byte[] buffer = baos.toByteArray();
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
+        socket.send(packet);
+    }
+
+    public static void sendScore(int score, String id) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        if (Application.playerName == null) {
+            Application.playerName = "SERVER";
+        }
+        oos.writeObject(new ScoreMessage(score, id));
         byte[] buffer = baos.toByteArray();
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
         socket.send(packet);
@@ -149,7 +168,6 @@ public class ClientProgram {
         byte[] buffer = baos.toByteArray();
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
         socket.send(packet);
-
     }
 
 

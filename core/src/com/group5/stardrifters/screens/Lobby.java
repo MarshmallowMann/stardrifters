@@ -47,7 +47,6 @@ public class Lobby extends AbstractScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
-                    System.out.println("Playing with " + ClientProgram.playerCount + " players");
                     ClientProgram.sendStartGameRequest("StartGame");
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -79,9 +78,7 @@ public class Lobby extends AbstractScreen {
 
     @Override
     public void render(float delta) {
-        System.out.println(ClientProgram.start);
         if(ClientProgram.start) {
-            System.out.println("Pass");
             app.gsm.setScreen(GameScreenManager.STATE.GAME);
         }
         playerCountLabel.setText(ClientProgram.playerCount + "/8");

@@ -71,6 +71,9 @@ public class Server {
     } else if (message instanceof GameStartMessage) {
         GameStartMessage gameStartMessage = (GameStartMessage) message;
         broadcastToAllClients(clientSocketAddress, gameStartMessage);
+    } else if (message instanceof ScoreMessage) {
+        ScoreMessage scoreMessage = (ScoreMessage) message;
+        broadcastToAllClients(clientSocketAddress, scoreMessage);
     } else if (message instanceof SyncGamePacket) {
         SyncGamePacket syncGamePacket = (SyncGamePacket) message;
         broadcastToAllClients(clientSocketAddress, syncGamePacket);
@@ -103,6 +106,13 @@ public class Server {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(gameStateMessage);
+            buffer = baos.toByteArray();
+        } else if (message instanceof ScoreMessage) {
+            ScoreMessage scoreMessage = (ScoreMessage) message;
+            System.out.println("Broadcasting score(" + scoreMessage.getScore() + ") to client: " + scoreMessage.getName());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(scoreMessage);
             buffer = baos.toByteArray();
         } else if (message instanceof SyncGamePacket) {
             SyncGamePacket syncGamePacket = (SyncGamePacket) message;

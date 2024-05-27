@@ -181,6 +181,7 @@ public class GameScreen extends AbstractScreen {
             //store all box bodies
             for (Box box : boxes) {
                 bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
+                ClientProgram.sendScore(box.score, box.id);
             }
             // sync the bodies with the server
             ClientProgram.syncBodies(bodies);
@@ -198,7 +199,6 @@ public class GameScreen extends AbstractScreen {
                 if (Application.playerName.equals("Player1")) {
                     box.respawn(camera);
                 }
-
             }
             float forceMagnitude = (G * 15f* box.body.getMass()) / (distance * distance);
             // Apply the gravitational force to the rectangle body
@@ -230,88 +230,72 @@ public class GameScreen extends AbstractScreen {
                 }
             }
         }
-if (!ClientProgram.gameObjects.isEmpty()) {
-    // get the box object from the game object
-    GameObject gameObject = ClientProgram.gameObjects.get(0);
-    for (Box box : boxes) {
-        if (box.id.equals(gameObject.getObjectName())) {
-            box.body.setTransform(gameObject.getPosition(), gameObject.getRotation());
-            box.body.setLinearVelocity(gameObject.getVelocity());
-            box.body.setAngularVelocity(gameObject.getAngularVelocity());
-            break;
-        }
-    }
-    ClientProgram.gameObjects.remove(0);
-} else {
-for (Box box : boxes) {
-    box.prevPosition = box.body.getPosition().cpy();
-    box.prevVelocity = box.body.getLinearVelocity().cpy();
-}
+        if (!ClientProgram.gameObjects.isEmpty()) {
+            // get the box object from the game object
+            GameObject gameObject = ClientProgram.gameObjects.get(0);
+            for (Box box : boxes) {
+                if (box.id.equals(gameObject.getObjectName())) {
+                    box.body.setTransform(gameObject.getPosition(), gameObject.getRotation());
+                    box.body.setLinearVelocity(gameObject.getVelocity());
+                    box.body.setAngularVelocity(gameObject.getAngularVelocity());
+                    break;
+                }
+            }
+            ClientProgram.gameObjects.remove(0);
+        } else {
+            for (Box box : boxes) {
+                box.prevPosition = box.body.getPosition().cpy();
+                box.prevVelocity = box.body.getLinearVelocity().cpy();
+            }
 
-//        If syncGamePackets is not empty, sync the game state
-//        if (!ClientProgram.syncGamePackets.isEmpty()) {
-//            System.out.println("Syncing game state");
-//            ArrayList<GameObject> bodies = ClientProgram.syncGamePackets.get(0).getBodies();
-//            for (GameObject body : bodies) {
-//                for (Box box : boxes) {
-//                    if (box.id.equals(body.getObjectName())) {
-//                        box.body.setTransform(body.getPosition(), body.getRotation());
-//                        box.body.setLinearVelocity(body.getVelocity());
-//                        box.body.setAngularVelocity(body.getAngularVelocity());
-//                        break;
-//                    }
-//                }
-//            }
-//            ClientProgram.syncGamePackets.remove(0);
-//        }
-        // Step 2: When you receive a new position and velocity from the server, set them as the target position and velocity
-if (!ClientProgram.syncGamePackets.isEmpty()) {
-    System.out.println("Syncing game state");
-    ArrayList<GameObject> bodies = ClientProgram.syncGamePackets.get(0).getBodies();
-    for (GameObject body : bodies) {
-        for (Box box : boxes) {
-            if (box.id.equals(body.getObjectName())) {
-                box.targetPosition = body.getPosition();
-                box.targetVelocity = body.getVelocity();
-                box.body.setAngularVelocity(body.getAngularVelocity());
-                break;
+            //        If syncGamePackets is not empty, sync the game state
+            //        if (!ClientProgram.syncGamePackets.isEmpty()) {
+            //            System.out.println("Syncing game state");
+            //            ArrayList<GameObject> bodies = ClientProgram.syncGamePackets.get(0).getBodies();
+            //            for (GameObject body : bodies) {
+            //                for (Box box : boxes) {
+            //                    if (box.id.equals(body.getObjectName())) {
+            //                        box.body.setTransform(body.getPosition(), body.getRotation());
+            //                        box.body.setLinearVelocity(body.getVelocity());
+            //                        box.body.setAngularVelocity(body.getAngularVelocity());
+            //                        break;
+            //                    }
+            //                }
+            //            }
+            //            ClientProgram.syncGamePackets.remove(0);
+            //        }
+                    // Step 2: When you receive a new position and velocity from the server, set them as the target position and velocity
+            if (!ClientProgram.syncGamePackets.isEmpty()) {
+//                System.out.println("Syncing game state");
+                ArrayList<GameObject> bodies = ClientProgram.syncGamePackets.get(0).getBodies();
+                for (GameObject body : bodies) {
+                    for (Box box : boxes) {
+                        if (box.id.equals(body.getObjectName())) {
+                            box.targetPosition = body.getPosition();
+                            box.targetVelocity = body.getVelocity();
+                            box.body.setAngularVelocity(body.getAngularVelocity());
+                            break;
+                        }
+                    }
+                }
+                ClientProgram.syncGamePackets.remove(0);
+            }
+
+            // Step 3: In each frame, gradually move the Box object from its current position and velocity towards the target position and velocity
+            for (Box box : boxes) {
+                if (box.targetPosition != null && box.targetVelocity != null) {
+                    Vector2 newPosition = box.prevPosition.lerp(box.targetPosition, delta);
+                    Vector2 newVelocity = box.prevVelocity.lerp(box.targetVelocity, delta);
+                    box.body.setTransform(newPosition, box.body.getAngle());
+                    box.body.setLinearVelocity(newVelocity);
+                }
             }
         }
-    }
-    ClientProgram.syncGamePackets.remove(0);
-}
-
-// Step 3: In each frame, gradually move the Box object from its current position and velocity towards the target position and velocity
-for (Box box : boxes) {
-    if (box.targetPosition != null && box.targetVelocity != null) {
-        Vector2 newPosition = box.prevPosition.lerp(box.targetPosition, delta);
-        Vector2 newVelocity = box.prevVelocity.lerp(box.targetVelocity, delta);
-        box.body.setTransform(newPosition, box.body.getAngle());
-        box.body.setLinearVelocity(newVelocity);
-    }
-}
-}
-
-
-
-
-
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             ClientProgram.sendControlMessageToServer("Impulse");
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            // Calculate impulse direction away from the circle
-            Vector2 boxPosition = boxes.get(1).body.getPosition();
-            Vector2 impulseDirection = boxPosition.cpy().sub(circlePosition);
-            impulseDirection.nor();
-            // Calculate impulse magnitude
-            float impulseMagnitude = 15f;
-            // Apply impulse to the box
-            boxes.get(1).body.applyLinearImpulse(impulseDirection.scl(impulseMagnitude), boxPosition, true);
-        }
         //generate impulse based on server message
-
         stage.act(delta);
         hud.update(delta);
         this.camera.update();
@@ -390,6 +374,4 @@ for (Box box : boxes) {
     public void setShouldMoveDynamicBody(boolean shouldMoveDynamicBody) {
         this.shouldMoveDynamicBody = shouldMoveDynamicBody;
     }
-
-
 }

@@ -25,12 +25,9 @@ public class Box {
     public Box(World world, float X, float Y, float width, float height, String id, Application app) {
         this.body = B2DBodyBuilder.createBox(world, X, Y, width, height);
         this.body.setUserData(this);
-        this.score = 100;
+        this.score = 0;
         this.id = id;
         this.app = app;
-
-
-
     }
 
     public void updateScore() {
@@ -52,13 +49,10 @@ public class Box {
     public void hit() {
 //        System.out.println("Box " + this.id + " has been hit!");
         // Send a message to the server that the box has been hit
-//
-         this.score--;
+
 //        System.out.println("Score: " + this.score);
 
-//        Send a message to the server that t he box has been hit
-
-
+//        Send a message to the server that the box has been hit
 
         // respawn box in a random location
         this.hit = true;
@@ -66,10 +60,8 @@ public class Box {
 
     public void hitFood(){
 //        System.out.println("Box " + this.id + " has eaten food!");
-
         this.score += 10;
 //        System.out.println("Score: " + this.score);
-
     }
 
     public void respawn(OrthographicCamera camera) {

@@ -13,6 +13,7 @@ import com.group5.stardrifters.Application;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.graphics.Color;
+import com.group5.stardrifters.utils.ClientProgram;
 import com.group5.stardrifters.utils.MyTextInputListener;
 
 public class HUD implements Disposable {
@@ -76,11 +77,8 @@ public class HUD implements Disposable {
             countdownLabel.setText(String.format("%03d", worldTimer));
             timeCount = 0;
         }
-    }
-
-    public static void addScore(int value){
-        score += value;
-        scoreLabel.setText(String.format("%06d", score));
+        score = ClientProgram.score;
+        scoreLabel.setText(String.format("%03d", score));
     }
 
     @Override
