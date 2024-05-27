@@ -81,7 +81,6 @@ public class ClientProgram {
 
     public void receiveMessages() throws IOException, ClassNotFoundException {
         byte[] buffer = new byte[1024];
-        byte[] buffer2 = new byte[65507];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
         while (true) {

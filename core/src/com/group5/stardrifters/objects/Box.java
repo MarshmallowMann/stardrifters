@@ -8,7 +8,12 @@ import com.group5.stardrifters.Application;
 import com.group5.stardrifters.utils.B2DBodyBuilder;
 import com.group5.stardrifters.utils.GameObject;
 
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import static com.group5.stardrifters.utils.B2DConstants.PPM;
+
 
 public class Box {
     public Body body;
@@ -21,6 +26,8 @@ public class Box {
     public Vector2 prevVelocity;
     public Vector2 targetPosition;
     public Vector2 targetVelocity;
+    public boolean timePassed = false;
+
 
     public Box(World world, float X, float Y, float width, float height, String id, Application app) {
         this.body = B2DBodyBuilder.createBox(world, X, Y, width, height);
@@ -30,6 +37,12 @@ public class Box {
         this.app = app;
 
 
+
+    }
+
+    //start a timer
+    public void startTimer(int timeLeft){
+        //start a timer
 
     }
 
@@ -59,7 +72,6 @@ public class Box {
 //        Send a message to the server that t he box has been hit
 
 
-
         // respawn box in a random location
         this.hit = true;
     }
@@ -74,9 +86,8 @@ public class Box {
 
     public void respawn(OrthographicCamera camera) {
         this.hit = false;
+        this.body.setActive(true);
         // hide the box for 2 seconds
-        this.body.setActive(false);
-        body.setActive(true);
         Vector2 location = randomLocation(camera);
 
 //        System.out.println("Respawning boxId:" + id + " at " + location);
@@ -84,6 +95,37 @@ public class Box {
         // this object will contain the box id and the new location
         GameObject gameObject = new GameObject(location, this.body.getLinearVelocity(), (float) (Math.random() * 360), 0,  id);
         app.clientProgram.sendGameObject(gameObject);
+    }
+
+    public void respawnDelay(OrthographicCamera camera, int timeLeft) {
+        //start a timer
+        hit = false;
+        Timer timer = new Timer();
+        System.out.println("Timer started");
+        long elapsedTime = System.currentTimeMillis();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    long timeToReachTarget = System.currentTimeMillis() - elapsedTime;
+                    if (timeToReachTarget >= 2000) {
+                        System.out.println("Two seconds have passed");
+                        Vector2 location = randomLocation(camera);
+                        GameObject gameObject = new GameObject(location, body.getLinearVelocity(), (float) (Math.random() * 360), 0,  id);
+                        app.clientProgram.sendGameObject(gameObject);
+
+                        timer.cancel(); // Stop the timer
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 0, 1000);
+
+
+
+
     }
 
 

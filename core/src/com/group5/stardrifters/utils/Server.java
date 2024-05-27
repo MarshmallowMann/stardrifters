@@ -26,7 +26,6 @@ public class Server {
         System.out.println("Server started on port " + PORT);
 
         byte[] buffer = new byte[1024];
-        byte[] buffer2 = new byte[65507];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
         while (true) {

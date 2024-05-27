@@ -23,7 +23,7 @@ public class MyContactListener implements ContactListener {
                 circle = (Circle) fixtureA.getBody().getUserData();
             }
 
-
+            System.out.println("Box and Circle collided");
             box.hit();
             //detect if box hits food
         } else if (checkBoxFood(fixtureA, fixtureB)) {

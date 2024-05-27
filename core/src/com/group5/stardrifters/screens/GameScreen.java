@@ -95,7 +95,7 @@ public class GameScreen extends AbstractScreen {
          Color[] colors = new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE};
 
         circle = new Circle(world, camera.viewportWidth/2, camera.viewportHeight/2, 16f, "circle");
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 1; i++) {
             Box box = new Box(world, camera.viewportWidth/2, camera.viewportHeight/2, 32, 32, "Player" + (i+1), app);
             box.respawn(camera);
             Vector2 linearForce = new Vector2(0, 1000);
@@ -154,6 +154,10 @@ public class GameScreen extends AbstractScreen {
                 bodies.add(new GameObject(box.body.getPosition(), box.body.getLinearVelocity(), box.body.getAngle(), box.body.getAngularVelocity(), box.id));
             }
 
+            for (Food food : foods) {
+                foodBodies.add(new GameObject(food.body.getPosition(), new Vector2(0,0), 0, 0, food.id));
+            }
+
             // sync the bodies with the server
             //print the id of the bodies
             for (GameObject body : bodies) {
@@ -162,7 +166,6 @@ public class GameScreen extends AbstractScreen {
             ClientProgram.syncBodies(bodies);
             ClientProgram.syncFood(foodBodies);
         }
-
     }
 
     @Override
@@ -207,7 +210,6 @@ public class GameScreen extends AbstractScreen {
             }
             foodBodies.clear();
             // sync the bodies with the server
-
         }
 
 
@@ -217,11 +219,10 @@ public class GameScreen extends AbstractScreen {
             float distance = direction.len();
             if (distance > 0) direction.nor();
             if (box.hit) {
-                //app.clientProgram.sendMessage( box.id + "has eaten food!. Score" + box.score);
+                System.out.println("Box " + box.id + " has been hit!");
                 if (Application.playerName.equals("Player1")) {
-                    box.respawn(camera);
+                    box.respawnDelay(camera, ClientProgram.timeLeft);
                 }
-
             }
             float forceMagnitude = (G * 15f* box.body.getMass()) / (distance * distance);
             // Apply the gravitational force to the rectangle body
