@@ -22,11 +22,34 @@ import javax.swing.*;
 import java.util.*;
 
 public class GameOver extends AbstractScreen {
-    private static final TreeMap<String, Integer> leaderBoard = ClientProgram.leaderBoard;
 
     public GameOver(final Application app) {
         super(app);
 
+    }
+
+    public static HashMap<String, Integer> sortByValueDescending(HashMap<String, Integer> hm) {
+        List<Map.Entry<String, Integer>> list =
+                new LinkedList<Map.Entry<String, Integer>>(hm.entrySet());
+
+        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> o1,
+                               Map.Entry<String, Integer> o2) {
+                // Descending order by value
+                return o2.getValue() - o1.getValue();
+            }
+        });
+
+        HashMap<String, Integer> temp = new LinkedHashMap<String, Integer>();
+        for (Map.Entry<String, Integer> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+        return temp;
+    }
+
+    @Override
+    public void show() {
         Label.LabelStyle font = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
 
         Table table = new Table();
@@ -36,21 +59,17 @@ public class GameOver extends AbstractScreen {
         Label gameOver = new Label("GAME OVER", font);
         Label playAgain = new Label("Click anywhere to exit", font);
 
+        Map<String, Integer> leaderBoard = sortByValueDescending(ClientProgram.leaderBoard);
+
         table.add(gameOver).expandX();
         table.row();
         for (Map.Entry<String, Integer> entry : leaderBoard.entrySet()) {
-            System.out.println("pass");
             table.add(new Label(entry.getKey() + ": " + entry.getValue(), font)).expandX().padTop(10f);
             table.row();
         }
         table.add(playAgain).expandX().padTop(10f);
 
         stage.addActor(table);
-    }
-
-    @Override
-    public void show() {
-
     }
 
     @Override
@@ -82,13 +101,5 @@ public class GameOver extends AbstractScreen {
     @Override
     public void hide() {
 
-    }
-
-    public static class ScoreComparator implements Comparator<Box> {
-
-        @Override
-        public int compare(Box o1, Box o2) {
-            return o2.score - o1.score;
-        }
     }
 }

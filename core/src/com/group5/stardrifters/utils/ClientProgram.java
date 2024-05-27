@@ -22,8 +22,8 @@ public class ClientProgram {
     public static int playerCount = 0;
     public static boolean start = false;
     public static int score = 0;
-    public static int timeLeft = 160;
-    public static TreeMap<String, Integer> leaderBoard = new TreeMap<String, Integer>(Collections.reverseOrder());
+    public static int timeLeft = 10;
+    public static HashMap<String, Integer> leaderBoard = new HashMap<>();
 
     public static void syncBodies(ArrayList<GameObject> bodies) {
         try {
