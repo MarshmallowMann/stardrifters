@@ -318,8 +318,8 @@ public class GameScreen extends AbstractScreen {
             // position and velocity towards the target position and velocity
             for (Box box : boxes) {
                 if (box.targetPosition != null && box.targetVelocity != null) {
-                    Vector2 newPosition = box.prevPosition.lerp(box.targetPosition, delta);
-                    Vector2 newVelocity = box.prevVelocity.lerp(box.targetVelocity, delta);
+                    Vector2 newPosition = box.prevPosition.lerp(box.targetPosition, delta * 2f);
+                    Vector2 newVelocity = box.prevVelocity.lerp(box.targetVelocity, delta * 2f);
                     box.body.setTransform(newPosition, box.body.getAngle());
                     box.body.setLinearVelocity(newVelocity);
                 }
