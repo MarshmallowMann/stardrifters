@@ -21,7 +21,6 @@ import com.group5.stardrifters.objects.Box;
 import com.group5.stardrifters.objects.Circle;
 import com.group5.stardrifters.objects.Food;
 import com.group5.stardrifters.utils.*;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -97,7 +96,7 @@ public class GameScreen extends AbstractScreen {
         Color[] colors = new Color[] { Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE };
 
         circle = new Circle(world, camera.viewportWidth / 2, camera.viewportHeight / 2, 16f, "circle");
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < ClientProgram.playerCount; i++) {
             Box box = new Box(world, camera.viewportWidth / 2, camera.viewportHeight / 2, 32, 32, "Player" + (i + 1),
                     app);
             box.respawn(camera);
