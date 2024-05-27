@@ -4,13 +4,19 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Server {
     private static final int PORT = 9000;
     private static DatagramSocket socket;
     private static List<SocketAddress> clients = new ArrayList<>();
     static ArrayList<String> playerNames = new ArrayList<>();
+    private static long startTime;
     public static void main(String[] args) throws IOException, ClassNotFoundException {
+
+
+        // Send time every second
         socket = new DatagramSocket(PORT);
          for (int i = 1; i <= 8; i++) {
             playerNames.add("Player" + i);
@@ -28,6 +34,22 @@ public class Server {
 
             if (!clients.contains(clientSocketAddress)) {
                 clients.add(clientSocketAddress);
+                if (clients.size() == 1){
+                    Timer timer = new Timer();
+                    System.out.println("Timer started");
+                    startTime = System.currentTimeMillis();
+                    timer.scheduleAtFixedRate(new TimerTask() {
+                        @Override
+                        public void run() {
+                            try {
+                                long elapsedTime = System.currentTimeMillis() - startTime;
+                                broadcastTimeToAllClients(elapsedTime);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, 0, 1000);
+                }
                 connected(clientSocketAddress);
             } else {
                 received(clientSocketAddress, packet.getData());
@@ -52,6 +74,8 @@ public class Server {
         broadcastToAllClients(clientSocketAddress, new PacketMessage(name + " has joined the server.", "SERVER"));
         broadcastToAllClients(clientSocketAddress, new GameStateMessage(clients.size()));
         System.out.println("Client connected: " + socketAddress.getAddress().getHostAddress() + ":" + socketAddress.getPort());
+
+
     }
 
     private static void received(SocketAddress clientSocketAddress, byte[] data) throws IOException, ClassNotFoundException {
@@ -170,5 +194,18 @@ public class Server {
         clients.remove(clientSocketAddress);
         InetSocketAddress socketAddress = (InetSocketAddress) clientSocketAddress;
         System.out.println("Client disconnected: " + socketAddress.getAddress().getHostAddress() + ":" + socketAddress.getPort());
+    }
+
+    private static void broadcastTimeToAllClients(long time) throws IOException {
+        TimeMessage timeMessage = new TimeMessage(time);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(timeMessage);
+        byte[] buffer = baos.toByteArray();
+        for (SocketAddress clientSocketAddress : clients) {
+            InetSocketAddress socketAddress = (InetSocketAddress) clientSocketAddress;
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, socketAddress.getAddress(), socketAddress.getPort());
+            socket.send(packet);
+        }
     }
 }

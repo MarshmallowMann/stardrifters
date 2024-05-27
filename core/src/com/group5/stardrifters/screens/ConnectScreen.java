@@ -67,7 +67,7 @@ public class ConnectScreen extends AbstractScreen {
                                            }
                                        });
                                        clientThread.start();
-                                       app.gsm.setScreen(GameScreenManager.STATE.LOBBY);
+                                       app.gsm.setScreen(GameScreenManager.STATE.GAME);
                                    }
                                }
         );

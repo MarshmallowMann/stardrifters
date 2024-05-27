@@ -17,7 +17,7 @@ import com.group5.stardrifters.utils.ClientProgram;
 import java.io.IOException;
 
 public class Lobby extends AbstractScreen {
-//    private int playerCount = ClientProgram.playerCount;
+    // private int playerCount = ClientProgram.playerCount;
     private Label waitingLabel, playerCountLabel;
     private Table buttonTable;
     SpriteBatch batch = new SpriteBatch();
@@ -34,7 +34,7 @@ public class Lobby extends AbstractScreen {
         labelStyle.font = new BitmapFont(Gdx.files.internal("Orbitron.fnt"));
         labelStyle.fontColor = Color.WHITE;
 
-        waitingLabel  = new Label("Waiting for other players (Min. of 4)", labelStyle);
+        waitingLabel = new Label("Waiting for other players (Min. of 4)", labelStyle);
         playerCountLabel = new Label(ClientProgram.playerCount + "/8", labelStyle);
 
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
@@ -54,14 +54,13 @@ public class Lobby extends AbstractScreen {
             }
         });
         buttonTable.add(playButton).expandX();
-        buttonTable.setVisible(false);
+        buttonTable.setVisible(true);
 
         table.add(waitingLabel).expandX();
         table.row();
         table.add(playerCountLabel).expandX().padTop(10f);
         table.row();
         table.add(buttonTable).expandX().padTop(10f);
-
 
         stage.addActor(table);
     }
@@ -78,7 +77,7 @@ public class Lobby extends AbstractScreen {
 
     @Override
     public void render(float delta) {
-        if(ClientProgram.start) {
+        if (ClientProgram.start) {
             app.gsm.setScreen(GameScreenManager.STATE.GAME);
         }
         playerCountLabel.setText(ClientProgram.playerCount + "/8");

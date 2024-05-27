@@ -17,4 +17,5 @@ public class SyncGamePacket extends Message {
     public ArrayList<GameObject> getBodies() {
         return bodies;
     }
+
 }
