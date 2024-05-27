@@ -59,8 +59,10 @@ public class Box {
 
         // Send a message to the server that the box has been hit
 
-        // respawn box in a random location
-        this.hit = true;
+        if (!this.hit) {
+            this.hit = true;
+            // Rest of the logic...
+        }
     }
 
     public void hitFood() {
@@ -85,30 +87,29 @@ public class Box {
 
     public void respawnDelay(OrthographicCamera camera, int timeLeft) {
         // start a timer
-        hit = false;
         Timer timer = new Timer();
         System.out.println("Timer started");
         long elapsedTime = System.currentTimeMillis();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    long timeToReachTarget = System.currentTimeMillis() - elapsedTime;
-                    if (timeToReachTarget >= 2000) {
-                        System.out.println("Two seconds have passed");
-                        Vector2 location = randomLocation(camera);
-                        GameObject gameObject = new GameObject(location, body.getLinearVelocity(),
+        //place the box in a far location
+        GameObject gameObject = new GameObject(new Vector2(1000,1000), body.getLinearVelocity(),
                                 (float) (Math.random() * 360), 0, id);
                         app.clientProgram.sendGameObject(gameObject);
-
-                        timer.cancel(); // Stop the timer
-
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        if (this.hit) {
+            System.out.println("Box " + this.id + " has been hit!");
+            timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                // Print task to show that the timer has started
+                System.out.println("Timer task executed");
+                Vector2 location = randomLocation(camera);
+                GameObject gameObject = new GameObject(location, body.getLinearVelocity(),
+                        (float) (Math.random() * 360), 0, id);
+                app.clientProgram.sendGameObject(gameObject);
+                hit = false;
             }
-        }, 0, 1000);
+        }, 2000);
+        }
+
 
     }
 
